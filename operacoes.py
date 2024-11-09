@@ -7,10 +7,6 @@ import pandas as pd
 
 from mst import Mst
 
-from textwrap import dedent
-import os
-
-
 class Heuristics(StrEnum):
     MST = "agm"
     CLOSEST_NEIGHBOR = "nn"
