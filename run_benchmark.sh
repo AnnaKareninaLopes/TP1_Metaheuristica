@@ -1,12 +1,6 @@
 #!/bin/bash
 
 
-function exe(){
-    echo "$@"
-    "$@"
-}
-
-
 function run_benchmark(){
     output_dir=$1
     instances_dir=$2
@@ -20,7 +14,7 @@ function run_benchmark(){
         echo "running now agm heuristic"
         instance_directory="$output_dir/$(echo $file | egrep '\..+$')"
         mkdir -p $instance_directory
-        exe python3 main.py $instances_dir/$file $instance_directory/result.$file.agm.txt agm $start_node
+        python3 main.py $instances_dir/$file $instance_directory/result.$file.agm.txt agm $start_node
         if [ $? -ne 0 ]; then
             echo "Error running agm heuristic"
             exit 1
