@@ -27,11 +27,9 @@ class Mst:
     def __get_first_unconnected(self, visited: set[int], adjacent_to_tree: list[tuple[int, int]]):
         _, _, to = adjacent_to_tree[0]
         while to in visited:
-            adjacent_to_tree.pop(0)
-            heapq.heapify(adjacent_to_tree)
+            heapq.heappop(adjacent_to_tree)
             _, _, to = adjacent_to_tree[0]
-        min_edge = adjacent_to_tree.pop(0)
-        heapq.heapify(adjacent_to_tree)
+        min_edge = heapq.heappop(adjacent_to_tree)
         return min_edge
 
     def __gen_mst(self, edge_matrix: dict[int, list[tuple[int, int]]], first_city: int):
