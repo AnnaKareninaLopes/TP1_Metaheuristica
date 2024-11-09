@@ -1,5 +1,6 @@
 from enum import StrEnum
 import math
+import os
 import re
 import time
 import typing
@@ -167,6 +168,21 @@ def heuristica_arvore_geradora_minima(coordenadas, cidade_inicial):
         )
     return path, distances, []
 
+def save_results(linha_dados: list, arquivo_saida:str):
+    if not os.path.exists(arquivo_saida):
+        cabecalho = ["INSTANCE", "METHOD", "PARAM", "OBJECTIVE_FUNCTION", "OPTIMUM", "GAP", "TIME", "NODES", "ARCS"]
+        df = pd.DataFrame([linha_dados], columns=cabecalho)
+        with open(arquivo_saida, "w", encoding='utf-8') as f:
+            f.write(str(df.to_string(index=False, col_space=12, justify="left")))
+        return
+    with open(arquivo_saida, "r", encoding='utf-8') as f:
+        existing_data = pd.read_csv(arquivo_saida, sep="\s+")
+        new_data = pd.DataFrame([linha_dados], columns=existing_data.columns)
+        updated_data = pd.concat([existing_data, new_data], ignore_index=True)
+    with open(arquivo_saida, "w", encoding='utf-8') as f:
+        f.write(str(updated_data.to_string(index=False, col_space=12, justify="left")))
+
+
 # Função para medir o tempo de execução e calcular todos os resultados
 def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, otimo, heuristica: Heuristics):
 
@@ -195,15 +211,8 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, ot
 
     print("Gap na função executar_tsp: ", gap)
 
-    # Conteúdo da linha de dados
     linha_dados = [arquivo_entrada, str(heuristica), str(coordenadas.index(cidade_inicial)) ,str(funcao_objetivo), str(otimo), f"{gap:.2f}", f"{tempo_execucao:.4f}", str(numero_nos), str(numero_arcos) ]
-    # Verificar se o arquivo já existe
-    cabecalho = ["INSTANCE", "METHOD", "PARAM", "OBJECTIVE_FUNCTION", "OPTIMUM", "GAP", "TIME", "NODES", "ARCS"]
-
-    df = pd.DataFrame([linha_dados], columns=cabecalho)
-    # Gravação no arquivo
-    with open(arquivo_saida, 'a') as arquivo:
-        arquivo.write(str(df.to_string(index=False, col_space=12, justify="left")))
+    save_results(linha_dados, arquivo_saida)
 
     print(f"Função Objetivo: {funcao_objetivo:.2f}")
     print(f"Tempo de Execução: {tempo_execucao:.4f} segundos")
