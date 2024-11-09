@@ -1,5 +1,6 @@
 from enum import StrEnum
 import math
+import re
 import time
 import typing
 
@@ -43,6 +44,7 @@ def leitor_coordenadas_tsp(arquivo):
 
 # Função para obter o valor ótimo da instância
 def obter_otimo(arquivo_csv, nome_instancia):
+    nome_instancia = re.sub(r'.+/', "", nome_instancia)
     df = pd.read_csv(arquivo_csv, thousands='.', decimal=',')
 
     # Acessa a linha correspondente à instância
