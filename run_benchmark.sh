@@ -14,15 +14,15 @@ function run_benchmark(){
         echo "running now agm heuristic"
         instance_directory="$output_dir/$(echo $file | egrep '\..+$')"
         mkdir -p $instance_directory
-        python3 main.py $instances_dir/$file $instance_directory/result.$file.agm.txt agm $start_node
+        python3 main.py $instances_dir/$file $instance_directory/result.$file.agm.txt agm $start_node > /dev/null 2>&1
         if [ $? -ne 0 ]; then
             echo "Error running agm heuristic"
             exit 1
         fi
         echo "running now nn heuristic"
-        python3 main.py $instances_dir/$file $instance_directory/result.$file.nn.txt nn $start_node
+        python3 main.py $instances_dir/$file $instance_directory/result.$file.nn.txt nn $start_node > /dev/null 2>&1
         echo "running now ci heuristic"
-        python3 main.py $instances_dir/$file $instance_directory/result.$file.ci.txt ci $start_node
+        python3 main.py $instances_dir/$file $instance_directory/result.$file.ci.txt ci $start_node > /dev/null 2>&1
     done
 
 }
