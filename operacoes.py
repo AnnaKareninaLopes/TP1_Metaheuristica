@@ -5,6 +5,9 @@ import pandas as pd
 
 from mst import Mst
 
+from textwrap import dedent
+import os
+
 # Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
     with open(arquivo, 'r') as arquivo:
@@ -161,6 +164,10 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
     # Executando o heurístico de vizinho mais próximo
     tour, distancias_tour, candidatos = heuristica(coordenadas, cidade_inicial)
 
+    # Calculando o tempo de execução
+    end_time = time.time()
+    tempo_execucao = end_time - start_time
+
     # Calculando o valor da função objetivo (distância total do tour)
     funcao_objetivo = calcular_funcao_objetivo(distancias_tour)
 
@@ -173,18 +180,24 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
 
     print("Gap na função executar_tsp: ", gap)
 
-    # Calculando o tempo de execução
-    end_time = time.time()
-    tempo_execucao = end_time - start_time
+    # Conteúdo da linha de dados
+    linha_dados = dedent(f"""
+        {arquivo_saida} {heuristica.__name__} {funcao_objetivo:.2f} {otimo} {gap:.2f}% {tempo_execucao:.4f} {numero_nos} {numero_arcos}
+        """)
 
-    # Escrevendo os resultados no arquivo de saída
-    with open(arquivo_saida, 'w') as f:
-        f.write(f"Função Objetivo (Distância Total): {funcao_objetivo:.2f}\n")
-        f.write(f"Tempo de Execução: {tempo_execucao:.4f} segundos\n")
-        f.write(f"Número de Nós: {numero_nos}\n")
-        f.write(f"Número de Arcos: {numero_arcos}\n")
-        f.write(f"Tour: {' -> '.join(map(str, tour))}\n")
-        f.write(f"GAP: {gap:.2f}\n")
+    # Verificar se o arquivo já existe
+    cabecalho = dedent("""\
+        INSTANCE      METHOD       PARAM  OBJECTIVE_FUNCTION  OPTIMUM   GAP   TIME   NODES   ARCS
+        """)
+
+    # Gravação no arquivo
+    with open(arquivo_saida, 'a') as arquivo:
+        # Adicionar cabeçalho apenas uma vez, se o arquivo for novo
+        if os.stat(arquivo_saida).st_size == 0:  # Verifica se o arquivo está vazio
+            arquivo.write(cabecalho)
+
+        # Adicionar a linha de dados
+        arquivo.write(linha_dados.strip() + '\n')  # Adiciona linha de dados com nova linha no final
 
     print(f"Função Objetivo: {funcao_objetivo:.2f}")
     print(f"Tempo de Execução: {tempo_execucao:.4f} segundos")
