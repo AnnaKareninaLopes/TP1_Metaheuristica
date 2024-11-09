@@ -1,9 +1,26 @@
+from enum import StrEnum
 import math
 import time
+import typing
 
 import pandas as pd
 
-# Lê o arquivo de coordenas e retorna uma lista com elas
+from mst import Mst
+
+class Heuristics(StrEnum):
+    MST = "agm"
+    CLOSEST_NEIGHBOR = "nn"
+    CHEAPEST_INSERTION = "ci"
+
+    def get_heuristic_function(self)->typing.Callable:
+        function_mapping = {
+            Heuristics.MST: heuristica_arvore_geradora_minima,
+            Heuristics.CLOSEST_NEIGHBOR: heuristica_vizinho_mais_proximo,
+            Heuristics.CHEAPEST_INSERTION: heuristica_insercao_mais_barata
+        }
+        return function_mapping[self]
+
+# Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
     with open(arquivo, 'r') as arquivo:
         coordenadas = []
@@ -135,10 +152,21 @@ def heuristica_insercao_mais_barata(coordenadas, cidade_inicial):
     return vetor_solucao, distancias_tour, vetor_cadidatos
 
 def heuristica_arvore_geradora_minima(coordenadas, cidade_inicial):
-    pass
+    index = coordenadas.index(cidade_inicial)
+    mst = Mst(coordenadas, index)
+    path = mst.solve()
+    distances = []
+    for current, neighbor in zip(path, path[1:]):
+        distances.append(
+            distancia_euclidiana_2d(
+                coordenadas[current],
+                coordenadas[neighbor]
+            )
+        )
+    return path, distances, []
 
 # Função para medir o tempo de execução e calcular todos os resultados
-def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
+def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, otimo, heuristica: Heuristics):
 
     print("Otimo na função executar_tsp: ", otimo)
 
@@ -146,7 +174,12 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
     start_time = time.time()
 
     # Executando o heurístico de vizinho mais próximo
-    tour, distancias_tour, candidatos = heuristica(coordenadas, cidade_inicial)
+    heuristic_function = heuristica.get_heuristic_function()
+    tour, distancias_tour, candidatos = heuristic_function(coordenadas, cidade_inicial)
+
+    # Calculando o tempo de execução
+    end_time = time.time()
+    tempo_execucao = end_time - start_time
 
     # Calculando o valor da função objetivo (distância total do tour)
     funcao_objetivo = calcular_funcao_objetivo(distancias_tour)
@@ -160,18 +193,15 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
 
     print("Gap na função executar_tsp: ", gap)
 
-    # Calculando o tempo de execução
-    end_time = time.time()
-    tempo_execucao = end_time - start_time
+    # Conteúdo da linha de dados
+    linha_dados = [arquivo_entrada, str(heuristica), str(coordenadas.index(cidade_inicial)) ,str(funcao_objetivo), str(otimo), f"{gap:.2f}", f"{tempo_execucao:.4f}", str(numero_nos), str(numero_arcos) ]
+    # Verificar se o arquivo já existe
+    cabecalho = ["INSTANCE", "METHOD", "PARAM", "OBJECTIVE_FUNCTION", "OPTIMUM", "GAP", "TIME", "NODES", "ARCS"]
 
-    # Escrevendo os resultados no arquivo de saída
-    with open(arquivo_saida, 'w') as f:
-        f.write(f"Função Objetivo (Distância Total): {funcao_objetivo:.2f}\n")
-        f.write(f"Tempo de Execução: {tempo_execucao:.4f} segundos\n")
-        f.write(f"Número de Nós: {numero_nos}\n")
-        f.write(f"Número de Arcos: {numero_arcos}\n")
-        f.write(f"Tour: {' -> '.join(map(str, tour))}\n")
-        f.write(f"GAP: {gap:.2f}\n")
+    df = pd.DataFrame([linha_dados], columns=cabecalho)
+    # Gravação no arquivo
+    with open(arquivo_saida, 'a') as arquivo:
+        arquivo.write(str(df.to_string(index=False, col_space=12, justify="left")))
 
     print(f"Função Objetivo: {funcao_objetivo:.2f}")
     print(f"Tempo de Execução: {tempo_execucao:.4f} segundos")
