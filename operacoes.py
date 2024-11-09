@@ -28,13 +28,13 @@ def leitor_coordenadas_tsp(arquivo):
 
 # Função para obter o valor ótimo da instância
 def obter_otimo(arquivo_csv, nome_instancia):
-    df = pd.read_csv(arquivo_csv)  # Lê o arquivo CSV
+    df = pd.read_csv(arquivo_csv, thousands='.', decimal=',')
 
     # Acessa a linha correspondente à instância
     linha = df[df['Instancia'] == nome_instancia]
 
     if not linha.empty:
-        return linha['Otimo'].values[0]  # Retorna o valor ótimo
+        return linha['Otimo'].values[0] # Retorna o valor ótimo
     return None  # Retorna None se não encontrar a instância
 
 # Função para calcular a distância Euclidiana em 2D
