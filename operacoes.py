@@ -3,6 +3,8 @@ import time
 
 import pandas as pd
 
+from mst import Mst
+
 # Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
     with open(arquivo, 'r') as arquivo:
@@ -135,7 +137,18 @@ def heuristica_insercao_mais_barata(coordenadas, cidade_inicial):
     return vetor_solucao, distancias_tour, vetor_cadidatos
 
 def heuristica_arvore_geradora_minima(coordenadas, cidade_inicial):
-    pass
+    index = coordenadas.index(cidade_inicial)
+    mst = Mst(coordenadas, index)
+    path = mst.solve()
+    distances = []
+    for current, neighbor in zip(path, path[1:]):
+        distances.append(
+            distancia_euclidiana_2d(
+                coordenadas[current],
+                coordenadas[neighbor]
+            )
+        )
+    return path, distances, []
 
 # Função para medir o tempo de execução e calcular todos os resultados
 def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
