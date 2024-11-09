@@ -1,6 +1,5 @@
 import argparse
 from enum import StrEnum
-import random
 import typing
 
 import operacoes
@@ -22,20 +21,24 @@ class Heuristics(StrEnum):
 def create_parser():
     parser = argparse.ArgumentParser(description="Execução do TSP com heurísticas")
     parser.add_argument(
-        "--filename",
+        "filename",
         type=str,
         help="Nome do arquivo de entrada"
     )
     parser.add_argument(
-        "--heuristic",
+        "output",
+        type=str,
+        help="nome do arquivo de saida para os resultados do benchmark"
+    )
+    parser.add_argument(
+        "heuristic",
         type=Heuristics,
         help="Heurística a ser utilizada"
     )
     parser.add_argument(
-        "--output",
-        type=str,
-        help="nome do arquivo de saida para os resultados do benchmark",
-        default="resultados_tsp.txt"
+        "initial_node",
+        type=int,
+        help="Nó inicial onde vai começar o caminho do tsp"
     )
     return parser
 
@@ -49,7 +52,7 @@ if __name__ == "__main__":
     print(f"Ótimo da instância dada: {otimo_instancia_dada}")
 
     # Seleciona um índice aleatório para a cidade inicial
-    indice_cidade_inicial = random.randint(0, len(matriz_coordenadas) - 1)
+    indice_cidade_inicial = args.initial_node
     cidade_inicial = matriz_coordenadas[indice_cidade_inicial]
     print(f"Cidade inicial aleatória: {cidade_inicial}, cujo índice é {indice_cidade_inicial}")
 
@@ -57,7 +60,7 @@ if __name__ == "__main__":
     heuristic_function = heuristic.get_heuristic_function()
 
     # Nome do arquivo de saída
-    arquivo_saida = 'resultado_tsp.txt'
+    arquivo_saida = args.output
 
     # Executa o TSP com a heurística escolhida
     operacoes.executar_tsp(matriz_coordenadas, cidade_inicial, arquivo_saida, otimo_instancia_dada, heuristic_function)
