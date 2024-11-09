@@ -3,7 +3,7 @@ import time
 
 import pandas as pd
 
-# Lê o arquivo de corrdenas e retorna uma lista com elas
+# Lê o arquivo de coordenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
     with open(arquivo, 'r') as arquivo:
         coordenadas = []
