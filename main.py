@@ -1,22 +1,6 @@
 import argparse
-from enum import StrEnum
-import typing
 
 import operacoes
-
-
-class Heuristics(StrEnum):
-    MST = "agm"
-    CLOSEST_NEIGHBOR = "nn"
-    CHEAPEST_INSERTION = "ci"
-
-    def get_heuristic_function(self)->typing.Callable:
-        function_mapping = {
-            Heuristics.MST: operacoes.heuristica_arvore_geradora_minima,
-            Heuristics.CLOSEST_NEIGHBOR: operacoes.heuristica_vizinho_mais_proximo,
-            Heuristics.CHEAPEST_INSERTION: operacoes.heuristica_insercao_mais_barata
-        }
-        return function_mapping[self]
 
 def create_parser():
     parser = argparse.ArgumentParser(description="Execução do TSP com heurísticas")
@@ -32,7 +16,7 @@ def create_parser():
     )
     parser.add_argument(
         "heuristic",
-        type=Heuristics,
+        type=operacoes.Heuristics,
         help="Heurística a ser utilizada"
     )
     parser.add_argument(
@@ -56,13 +40,12 @@ if __name__ == "__main__":
     cidade_inicial = matriz_coordenadas[indice_cidade_inicial]
     print(f"Cidade inicial aleatória: {cidade_inicial}, cujo índice é {indice_cidade_inicial}")
 
-    heuristic: Heuristics = args.heuristic
-    heuristic_function = heuristic.get_heuristic_function()
+    heuristic: operacoes.Heuristics = args.heuristic
 
     # Nome do arquivo de saída
     arquivo_saida = args.output
 
     # Executa o TSP com a heurística escolhida
-    operacoes.executar_tsp(matriz_coordenadas, cidade_inicial, arquivo_saida, otimo_instancia_dada, heuristic_function)
+    operacoes.executar_tsp(matriz_coordenadas, cidade_inicial, args.filename, arquivo_saida, otimo_instancia_dada, heuristic)
 
     print(f"Resultados salvos em {arquivo_saida}")

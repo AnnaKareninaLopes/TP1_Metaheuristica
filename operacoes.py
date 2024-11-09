@@ -1,5 +1,7 @@
+from enum import StrEnum
 import math
 import time
+import typing
 
 import pandas as pd
 
@@ -7,6 +9,20 @@ from mst import Mst
 
 from textwrap import dedent
 import os
+
+
+class Heuristics(StrEnum):
+    MST = "agm"
+    CLOSEST_NEIGHBOR = "nn"
+    CHEAPEST_INSERTION = "ci"
+
+    def get_heuristic_function(self)->typing.Callable:
+        function_mapping = {
+            Heuristics.MST: heuristica_arvore_geradora_minima,
+            Heuristics.CLOSEST_NEIGHBOR: heuristica_vizinho_mais_proximo,
+            Heuristics.CHEAPEST_INSERTION: heuristica_insercao_mais_barata
+        }
+        return function_mapping[self]
 
 # Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
@@ -154,7 +170,7 @@ def heuristica_arvore_geradora_minima(coordenadas, cidade_inicial):
     return path, distances, []
 
 # Função para medir o tempo de execução e calcular todos os resultados
-def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
+def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, otimo, heuristica: Heuristics):
 
     print("Otimo na função executar_tsp: ", otimo)
 
@@ -162,7 +178,8 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
     start_time = time.time()
 
     # Executando o heurístico de vizinho mais próximo
-    tour, distancias_tour, candidatos = heuristica(coordenadas, cidade_inicial)
+    heuristic_function = heuristica.get_heuristic_function()
+    tour, distancias_tour, candidatos = heuristic_function(coordenadas, cidade_inicial)
 
     # Calculando o tempo de execução
     end_time = time.time()
@@ -181,23 +198,14 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_saida, otimo, heuristica):
     print("Gap na função executar_tsp: ", gap)
 
     # Conteúdo da linha de dados
-    linha_dados = dedent(f"""
-        {arquivo_saida} {heuristica.__name__} {funcao_objetivo:.2f} {otimo} {gap:.2f}% {tempo_execucao:.4f} {numero_nos} {numero_arcos}
-        """)
-
+    linha_dados = [arquivo_entrada, str(heuristica), str(coordenadas.index(cidade_inicial)) ,str(funcao_objetivo), str(otimo), f"{gap:.2f}", f"{tempo_execucao:.4f}", str(numero_nos), str(numero_arcos) ]
     # Verificar se o arquivo já existe
-    cabecalho = dedent("""\
-        INSTANCE      METHOD       PARAM  OBJECTIVE_FUNCTION  OPTIMUM   GAP   TIME   NODES   ARCS
-        """)
+    cabecalho = ["INSTANCE", "METHOD", "PARAM", "OBJECTIVE_FUNCTION", "OPTIMUM", "GAP", "TIME", "NODES", "ARCS"]
 
+    df = pd.DataFrame([linha_dados], columns=cabecalho)
     # Gravação no arquivo
     with open(arquivo_saida, 'a') as arquivo:
-        # Adicionar cabeçalho apenas uma vez, se o arquivo for novo
-        if os.stat(arquivo_saida).st_size == 0:  # Verifica se o arquivo está vazio
-            arquivo.write(cabecalho)
-
-        # Adicionar a linha de dados
-        arquivo.write(linha_dados.strip() + '\n')  # Adiciona linha de dados com nova linha no final
+        arquivo.write(str(df.to_string(index=False, col_space=12, justify="left")))
 
     print(f"Função Objetivo: {funcao_objetivo:.2f}")
     print(f"Tempo de Execução: {tempo_execucao:.4f} segundos")
