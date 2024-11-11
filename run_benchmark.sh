@@ -33,10 +33,10 @@ function help(){
 
 function main(){
 
-    if [ $# -ne 3 ]; then
-        help 1
-    elif [ $1 == "-h" ]; then
+    if [ $1 == "-h" ]; then
         help 0
+    elif [ $# -ne 3 ]; then
+        help 1
     fi
 
 
