@@ -39,11 +39,11 @@ function run_benchmark_and_storage_output_by_instance_file(){
     for file in $(ls $instances_dir); do
         echo "Running to instance $file"
         echo "running now agm heuristic"
-        python3 main.py $instances_dir/$file $agm_output_dir/result.$file.txt agm $start_node > /dev/null 2>&1
+        python3 main.py $instances_dir/$file $agm_output_dir/results.txt agm $start_node > /dev/null 2>&1
         echo "running now nn heuristic"
-        python3 main.py $instances_dir/$file $agm_output_dir/result.$file.txt nn $start_node > /dev/null 2>&1
+        python3 main.py $instances_dir/$file $nn_output_dir/results.txt nn $start_node > /dev/null 2>&1
         echo "running now ci heuristic"
-        python3 main.py $instances_dir/$file $agm_output_dir/result.$file.txt ci $start_node > /dev/null 2>&1
+        python3 main.py $instances_dir/$file $ci_output_dir/results.txt ci $start_node > /dev/null 2>&1
     done
 
 }
