@@ -1,4 +1,4 @@
-from enum import StrEnum
+from enum import Enum
 import math
 import os
 import re
@@ -9,7 +9,7 @@ import pandas as pd
 
 from mst import Mst
 
-class Heuristics(StrEnum):
+class Heuristics(str, Enum):
     MST = "agm"
     CLOSEST_NEIGHBOR = "nn"
     CHEAPEST_INSERTION = "ci"
