@@ -1,7 +1,9 @@
 import heapq
 from functools import reduce
 
-class Mst:
+from .base import ConstructiveHeuristic
+
+class Mst(ConstructiveHeuristic):
 
     def __gen_edge_matrix(
         self,
@@ -33,7 +35,7 @@ class Mst:
         return min_edge
 
     def __gen_mst(self, edge_matrix: dict[int, list[tuple[int, int]]], first_city: int):
-        mst = {first_city:[]}
+        mst = {first_city:[]} 
         visited = {first_city,}
         adjacent_to_tree = edge_matrix[first_city]
         visited.add(first_city)
