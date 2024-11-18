@@ -6,7 +6,7 @@ import typing
 
 import pandas as pd
 
-from mst import Mst
+from constructive_heuristics import Mst
 
 class Heuristics(str, Enum):
     MST = "agm"
