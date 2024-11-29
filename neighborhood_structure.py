@@ -6,10 +6,17 @@ from operacoes import calcular_funcao_objetivo
 class NeighborhoodStructure(ABC):
 
     @abstractmethod
-    def generate_neighborhood(self, solution: list[int]) -> bool:
+    def get_better_neighbor(self, solution: list[int]) -> bool:
         """
-        generate the next neighboor to a local search of according with the
-        specify neighborhood structure
+        get the best neighbor of a solution according with the specify
+        neighborhood structure
+        """
+
+    @abstractmethod
+    def get_neighbor(self, solution: list[int]) -> None:
+        """
+        get a neighbor of a solution according with the specify neighborhood,
+        not necessarily the best, only a neighbor
         """
 
 class Exchange(NeighborhoodStructure):
@@ -23,10 +30,7 @@ class Exchange(NeighborhoodStructure):
         solution[index], solution[index2] = solution[index2], solution[index]
         return cost
 
-    def generate_neighborhood(self, solution: list[int]) -> bool:
-        """
-        generate the next neighboord using the exchange neighborhood structure
-        """
+    def get_better_neighbor(self, solution: list[int]) -> bool:
         best_cost = inf
         by = None
         that = None
@@ -42,3 +46,6 @@ class Exchange(NeighborhoodStructure):
             return False
         solution[by], solution[that] = solution[that], solution[by]
         return True
+
+    def get_neighbor(self, solution: list[int]) -> None:
+        pass
