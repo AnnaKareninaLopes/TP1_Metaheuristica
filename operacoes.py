@@ -2,24 +2,28 @@ from enum import Enum
 import math
 import os
 import time
-import typing
+from typing import Type
 
 import pandas as pd
 
-from constructive_heuristics import Mst
+from constructive_heuristics import (
+    ConstructiveHeuristic,
+    CheapestInsertion,
+    Mst,
+    NearestNeighbor,
+)
 
-class Heuristics(str, Enum):
-    MST = "agm"
-    CLOSEST_NEIGHBOR = "nn"
-    CHEAPEST_INSERTION = "ci"
+class Heuristics(Enum):
+    MST = "agm", Mst
+    CLOSEST_NEIGHBOR = "nn", NearestNeighbor
+    CHEAPEST_INSERTION = "ci", CheapestInsertion
 
-    def get_heuristic_function(self)->typing.Callable:
-        function_mapping = {
-            Heuristics.MST: heuristica_arvore_geradora_minima,
-            Heuristics.CLOSEST_NEIGHBOR: heuristica_vizinho_mais_proximo,
-            Heuristics.CHEAPEST_INSERTION: heuristica_insercao_mais_barata
-        }
-        return function_mapping[self]
+    def __init__(self, value):
+        self.value = value[0]
+        self.heuristic_class = value[1]
+
+    def get_heuristic_class(self) -> Type[ConstructiveHeuristic]:
+        return self.heuristic_class
 
 # Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
