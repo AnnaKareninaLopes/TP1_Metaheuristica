@@ -13,17 +13,18 @@ from constructive_heuristics import (
     NearestNeighbor,
 )
 
-class Heuristics(Enum):
-    MST = "agm", Mst
-    CLOSEST_NEIGHBOR = "nn", NearestNeighbor
-    CHEAPEST_INSERTION = "ci", CheapestInsertion
-
-    def __init__(self, value):
-        self.value = value[0]
-        self.heuristic_class = value[1]
+class Heuristics(str, Enum):
+    MST = "agm"
+    CLOSEST_NEIGHBOR = "nn"
+    CHEAPEST_INSERTION = "ci"
 
     def get_heuristic_class(self) -> Type[ConstructiveHeuristic]:
-        return self.heuristic_class
+        heuristic_mapping = {
+            Heuristics.MST: Mst,
+            Heuristics.CLOSEST_NEIGHBOR: NearestNeighbor,
+            Heuristics.CHEAPEST_INSERTION: CheapestInsertion,
+        }
+        return heuristic_mapping[self]
 
 # Lê o arquivo de corrdenas e retorna uma lista com elas
 def leitor_coordenadas_tsp(arquivo):
@@ -157,19 +158,6 @@ def heuristica_insercao_mais_barata(coordenadas, cidade_inicial):
     distancias_tour.append(distancia_euclidiana_2d(coordenadas[vetor_solucao[-1]], coordenadas[vetor_solucao[0]]))
     return vetor_solucao, distancias_tour, vetor_cadidatos
 
-def heuristica_arvore_geradora_minima(coordenadas, cidade_inicial):
-    index = coordenadas.index(cidade_inicial)
-    mst = Mst(coordenadas, index)
-    path = mst.solve()
-    distances = []
-    for current, neighbor in zip(path, path[1:]):
-        distances.append(
-            distancia_euclidiana_2d(
-                coordenadas[current],
-                coordenadas[neighbor]
-            )
-        )
-    return path, distances, []
 
 def save_results(linha_dados: list, arquivo_saida:str):
     if not os.path.exists(arquivo_saida):
@@ -187,7 +175,7 @@ def save_results(linha_dados: list, arquivo_saida:str):
 
 
 # Função para medir o tempo de execução e calcular todos os resultados
-def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, otimo, heuristica: Heuristics):
+def run_constructive_heuristic(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, otimo, heuristica: Heuristics):
 
     print("Otimo na função executar_tsp: ", otimo)
 
@@ -195,15 +183,20 @@ def executar_tsp(coordenadas, cidade_inicial, arquivo_entrada, arquivo_saida, ot
     start_time = time.time()
 
     # Executando o heurístico de vizinho mais próximo
-    heuristic_function = heuristica.get_heuristic_function()
-    tour, distancias_tour, candidatos = heuristic_function(coordenadas, cidade_inicial)
+    heuristic_class = heuristica.get_heuristic_class()
+    heuristic = heuristic_class(cordenates=coordenadas, first_city=coordenadas.index(cidade_inicial))
+    tour = heuristic.solve()
 
     # Calculando o tempo de execução
     end_time = time.time()
     tempo_execucao = end_time - start_time
 
     # Calculando o valor da função objetivo (distância total do tour)
-    funcao_objetivo = calcular_funcao_objetivo(distancias_tour)
+    distances = []
+    for city, neighbor in zip(tour, tour[1:]):
+        distances.append(distancia_euclidiana_2d(coordenadas[city], coordenadas[neighbor]))
+
+    funcao_objetivo = calcular_funcao_objetivo(distances)
 
     # Calculando o número de nós (cidades) e arcos (viagens)
     numero_nos = len(coordenadas)

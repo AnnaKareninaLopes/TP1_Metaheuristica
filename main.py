@@ -46,6 +46,6 @@ if __name__ == "__main__":
     arquivo_saida = args.output
 
     # Executa o TSP com a heurística escolhida
-    operacoes.executar_tsp(matriz_coordenadas, cidade_inicial, args.filename, arquivo_saida, otimo_instancia_dada, heuristic)
+    operacoes.run_constructive_heuristic(matriz_coordenadas, cidade_inicial, args.filename, arquivo_saida, otimo_instancia_dada, heuristic)
 
     print(f"Resultados salvos em {arquivo_saida}")
