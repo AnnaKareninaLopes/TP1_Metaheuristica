@@ -1,6 +1,36 @@
 import argparse
+import time
 
-import operacoes
+from constructive_heuristics import HeuristicsEnum
+from local_search.hill_climbing import HillClimbing
+from neighborhood_structure import NeighborhoodStructureEnum
+from instance_handler import InstanceHandler
+
+def run_local_search(
+    initial_heuristic: HeuristicsEnum,
+    instance_handler: InstanceHandler,
+    first_city: int,
+    neighborhood_structure: NeighborhoodStructureEnum,
+):
+    neighborhood_structure_class = neighborhood_structure.get_neighborhood_structure_class()
+    neighborhood_structure_instance = neighborhood_structure_class()
+    start_time = time.time()
+    heuristic_class = initial_heuristic.get_heuristic_class()
+    cordenadas = instance_handler.cordenadas
+    heuristic = heuristic_class(cordenates=cordenadas, first_city=first_city)
+
+    local_search = HillClimbing(heuristic, neighborhood_structure_instance)
+    cost, solution = local_search.solve(instance_handler)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    instance_handler.save_results(
+        solution=solution,
+        heuristic=initial_heuristic,
+        city_initial=first_city,
+        objective_function=cost,
+        execution_time=execution_time,
+    )
 
 def create_parser():
     parser = argparse.ArgumentParser(description="Execução do TSP com heurísticas")
@@ -16,8 +46,13 @@ def create_parser():
     )
     parser.add_argument(
         "heuristic",
-        type=operacoes.Heuristics,
+        type=HeuristicsEnum,
         help="Heurística a ser utilizada"
+    )
+    parser.add_argument(
+        "neighborhood_structure",
+        type=NeighborhoodStructureEnum,
+        help="Estrutura de vizinhança a ser utilizada"
     )
     parser.add_argument(
         "initial_node",
@@ -26,26 +61,21 @@ def create_parser():
     )
     return parser
 
-if __name__ == "__main__":
+def main():
     p = create_parser()
     args = p.parse_args()
-    matriz_coordenadas = operacoes.leitor_coordenadas_tsp(args.filename)
-    print(matriz_coordenadas)
+    instance_handler = InstanceHandler(args.filename, args.output)
 
-    otimo_instancia_dada = operacoes.obter_otimo('otimos.csv', args.filename)
-    print(f"Ótimo da instância dada: {otimo_instancia_dada}")
-
-    # Seleciona um índice aleatório para a cidade inicial
-    indice_cidade_inicial = args.initial_node
-    cidade_inicial = matriz_coordenadas[indice_cidade_inicial]
-    print(f"Cidade inicial aleatória: {cidade_inicial}, cujo índice é {indice_cidade_inicial}")
-
-    heuristic: operacoes.Heuristics = args.heuristic
+    heuristic: HeuristicsEnum = args.heuristic
+    neighborhood_structure: NeighborhoodStructureEnum = args.neighborhood_structure
 
     # Nome do arquivo de saída
     arquivo_saida = args.output
 
     # Executa o TSP com a heurística escolhida
-    operacoes.run_constructive_heuristic(matriz_coordenadas, cidade_inicial, args.filename, arquivo_saida, otimo_instancia_dada, heuristic)
+    run_local_search(heuristic, instance_handler, args.initial_node, neighborhood_structure)
 
     print(f"Resultados salvos em {arquivo_saida}")
+
+if __name__ == "__main__":
+    main()
