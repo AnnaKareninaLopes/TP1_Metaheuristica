@@ -1,6 +1,6 @@
 from constructive_heuristics import ConstructiveHeuristic
 from neighborhood_structure import NeighborhoodStructure
-from operacoes import calcular_funcao_objetivo
+from instance_handler import InstanceHandler
 
 class HillClimbing:
 
@@ -12,17 +12,19 @@ class HillClimbing:
         self.__initial_heuristic = constructive_heuristic
         self.__neighborhood_structure = neighborhood_structure
 
-    def solve(self) -> tuple[float, list[int]]:
+    def solve(self, instance_handler: InstanceHandler) -> tuple[float, list[int]]:
         """
         Solve the TSP problem using the hill climbing algorithm
         returns a tuple with the cost of the solution and a list that is the
         encode of the path
         """
-        initial_solution = self.__initial_heuristic.solve()
+        initial_solution = self.__initial_heuristic.solve()[:-1]
         best_solution = initial_solution
-        best_cost = calcular_funcao_objetivo(best_solution)
+        best_cost = instance_handler.calcular_funcao_objetivo(best_solution)
         while True:
-            if not self.__neighborhood_structure.get_better_neighbor(best_solution):
+            new_cost = self.__neighborhood_structure.get_better_neighbor(instance_handler, best_solution, best_cost)
+            if not new_cost:
                 break
-            best_cost = calcular_funcao_objetivo(best_solution)
-        return best_cost, best_solution
+            best_cost = new_cost
+        best_solution = best_solution + best_solution[0:1]
+        return instance_handler.calcular_funcao_objetivo(best_solution), best_solution
