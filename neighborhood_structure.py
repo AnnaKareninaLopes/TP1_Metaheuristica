@@ -21,7 +21,7 @@ class NeighborhoodStructure(ABC):
     def get_neighbor(self, solution: list[int]) -> None:
         """
         get a neighbor of a solution according with the specify neighborhood,
-        not necessarily the best, only a neighbor
+        not necessarily the best, just a neighbor
         """
 
 class Exchange(NeighborhoodStructure):
@@ -34,7 +34,7 @@ class Exchange(NeighborhoodStructure):
         solution: list[int],
     ) -> int:
         """
-        calculate the cost of swap two elements in the solution
+        calculate the swap cost of two elements in the solution
         """
         solution[index], solution[index2] = solution[index2], solution[index]
         cost = instance_handler.calcular_funcao_objetivo(solution)
