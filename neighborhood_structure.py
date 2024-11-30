@@ -21,6 +21,7 @@ class TwoOpt(NeighborhoodStructure):
                     solution[i+1], solution[j] = solution[j], solution[i+1]
                     yield solution
                     solution[i+1], solution[j] = solution[j], solution[i+1]
+
 class NeighborhoodStructureEnum(str, Enum):
     TWOOPT = "TwoOpt"
 

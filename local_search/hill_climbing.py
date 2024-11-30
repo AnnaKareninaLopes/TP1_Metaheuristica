@@ -3,7 +3,6 @@ from typing import Optional
 from constructive_heuristics import ConstructiveHeuristic
 from neighborhood_structure import NeighborhoodStructure
 from instance_handler import InstanceHandler
-
 class HillClimbing:
 
     def __init__(
