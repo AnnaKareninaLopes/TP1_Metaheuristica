@@ -1,7 +1,9 @@
 from enum import Enum
 import time
+from typing import Type
 
 from constructive_heuristics import (
+    ConstructiveHeuristic,
     CheapestInsertion,
     Mst,
     NearestNeighbor,
@@ -16,12 +18,8 @@ class HeuristicMethods(str, Enum):
     CLOSEST_NEIGHBOR = "nn"
     CHEAPEST_INSERTION = "ci"
 
-    def solve(
-        self,
-        instance_handler: InstanceHandler,
-        start_city: int
-    ) -> None:
-        heuristic_mapping = {
+    def solve(self, instance_handler: InstanceHandler, start_city: int) -> None:
+        heuristic_mapping:dict[HeuristicMethods, Type[ConstructiveHeuristic]] = {
             HeuristicMethods.MST: Mst,
             HeuristicMethods.CLOSEST_NEIGHBOR: NearestNeighbor,
             HeuristicMethods.CHEAPEST_INSERTION: CheapestInsertion,
@@ -41,22 +39,18 @@ class HeuristicMethods(str, Enum):
             execution_time=run_time,
         )
 
+
 class LocalSearchMethods(str, Enum):
     LS2OPT = "ls2opt"
 
-    def solve(
-        self,
-        instance_handler: InstanceHandler,
-        start_city: int
-    ) -> None:
+    def solve(self, instance_handler: InstanceHandler, start_city: int) -> None:
         neighborhood_struct_mapping = {
             LocalSearchMethods.LS2OPT: TwoOpt,
         }
         neighborhood_struct = neighborhood_struct_mapping[self]()
         start_time = time.time()
         local_search = HillClimbing(
-            Mst(instance_handler.cordenadas, start_city),
-            neighborhood_struct
+            Mst(instance_handler.cordenadas, start_city), neighborhood_struct
         )
         cost, path = local_search.solve(instance_handler)
         end_time = time.time()
