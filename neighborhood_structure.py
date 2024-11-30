@@ -1,12 +1,17 @@
 from abc import ABC, abstractmethod
-from math import inf
+from enum import Enum
+from typing import Optional, Type
 
-from operacoes import calcular_funcao_objetivo
-
+from instance_handler import InstanceHandler
 class NeighborhoodStructure(ABC):
 
     @abstractmethod
-    def get_better_neighbor(self, solution: list[int]) -> bool:
+    def get_better_neighbor(
+        self,
+        instance_handler: InstanceHandler,
+        solution: list[int],
+        current_cost: int
+    ) -> Optional[int]:
         """
         get the best neighbor of a solution according with the specify
         neighborhood structure
@@ -21,31 +26,44 @@ class NeighborhoodStructure(ABC):
 
 class Exchange(NeighborhoodStructure):
 
-    def __calc_swap_cost(self, solution: list[int], index: int, index2: int) -> int:
+    def __calc_swap_cost(
+        self,
+        index: int,
+        index2: int,
+        instance_handler: InstanceHandler,
+        solution: list[int],
+    ) -> int:
         """
         calculate the cost of swap two elements in the solution
         """
         solution[index], solution[index2] = solution[index2], solution[index]
-        cost = calcular_funcao_objetivo(solution)
+        cost = instance_handler.calcular_funcao_objetivo(solution)
         solution[index], solution[index2] = solution[index2], solution[index]
         return cost
 
-    def get_better_neighbor(self, solution: list[int]) -> bool:
-        best_cost = inf
-        by = None
-        that = None
+    def get_better_neighbor(
+        self,
+        instance_handler: InstanceHandler,
+        solution: list[int],
+        current_cost: int
+    ) -> bool:
         for index, _ in enumerate(solution):
             for index2, _ in enumerate(solution):
                 if index != index2:
-                    cost = self.__calc_swap_cost(solution, index, index2)
-                    if cost < best_cost:
-                        best_cost = cost
-                        by = index
-                        that = index2
-        if best_cost == inf:
-            return False
-        solution[by], solution[that] = solution[that], solution[by]
-        return True
+                    cost = self.__calc_swap_cost(index, index2, instance_handler, solution)
+                    if cost < current_cost:
+                        solution[index], solution[index2] = solution[index2], solution[index]
+                        return cost
+        return None
 
     def get_neighbor(self, solution: list[int]) -> None:
         pass
+
+class NeighborhoodStructureEnum(str, Enum):
+    EXCHANGE = "exchange"
+
+    def get_neighborhood_structure_class(self) -> Type[NeighborhoodStructure]:
+        neighborhood_structure_mapping = {
+            NeighborhoodStructureEnum.EXCHANGE: Exchange
+        }
+        return neighborhood_structure_mapping[self]
