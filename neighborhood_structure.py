@@ -31,13 +31,25 @@ class DeleteInsert(NeighborhoodStructure):
                     cp.insert(index2, element)
                     yield cp
 
+class TwoOpt(NeighborhoodStructure):
+
+    def enumerate_neighbors(self, solution: list[int]) -> Generator[list[int], None, None]:
+        for i, _ in enumerate(solution[:-1]):
+            for j, _ in enumerate(solution[:-1]):
+                if i != j:
+                    solution[i+1], solution[j] = solution[j], solution[i+1]
+                    yield solution
+                    solution[i+1], solution[j] = solution[j], solution[i+1]
+
 class NeighborhoodStructureEnum(str, Enum):
     SWAPDISTANT = "SwapDistant"
     DELETEINSERT = "DeleteInsert"
+    TWOOPT = "TwoOpt"
 
     def get_neighborhood_structure_class(self) -> Type[NeighborhoodStructure]:
         neighborhood_structure_mapping = {
             NeighborhoodStructureEnum.SWAPDISTANT: SwapDistant,
             NeighborhoodStructureEnum.DELETEINSERT: DeleteInsert,
+            NeighborhoodStructureEnum.TWOOPT: TwoOpt
         }
         return neighborhood_structure_mapping[self]

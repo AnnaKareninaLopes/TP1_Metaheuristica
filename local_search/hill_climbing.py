@@ -29,7 +29,7 @@ class HillClimbing:
                 return neighbor, new_cost
         return None, None
 
-    def solve(self, instance_handler: InstanceHandler) -> tuple[float, list[int]]:
+    def solve(self, instance_handler: InstanceHandler) -> tuple[int, list[int]]:
         """
         Solve the TSP problem using the hill climbing algorithm
         returns a tuple with the cost of the solution and a list that is the
