@@ -2,7 +2,7 @@ import argparse
 from typing import Union
 
 from instance_handler import InstanceHandler
-from methods_options import HeuristicMethods, LocalSearchMethods
+from optimization_methods import HeuristicMethods, LocalSearchMethods
 
 
 def create_parser():

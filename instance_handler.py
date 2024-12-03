@@ -102,6 +102,12 @@ class InstanceHandler:
                 str(updated_data.to_string(index=False, col_space=12, justify="left"))
             )
 
+    def calculate_isolated_cost(self, i: int, j: int):
+        """
+        Calculates and returns the cost of leaves from i and going to j.
+        """
+        return distancia_euclidiana_2d(self.cordenadas[i], self.cordenadas[j])
+
     def calcular_funcao_objetivo(self, solution: list[int]) -> int:
         total_distance = 0
         for city, neighbor in zip(solution, solution[1:]):

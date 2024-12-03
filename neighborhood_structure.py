@@ -1,36 +1,37 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import Generator, Type
+import pickle
+from typing import Optional
 
+from instance_handler import InstanceHandler
 
 class NeighborhoodStructure(ABC):
     @abstractmethod
-    def enumerate_neighbors(
-        self, solution: list[int]
-    ) -> Generator[list[int], None, None]:
+    def improve(
+        self, instance_handler: InstanceHandler, scost:int, solution: list[int]
+    ) -> tuple[Optional[int], Optional[list[int]]]:
         """
-        Should enumerate all neighbors of a given current solution of according with a
-        specify neighborhood structure
+        Should to try improve a current solution with base a specific
+        neighborhood structure
         """
 
 
 class TwoOpt(NeighborhoodStructure):
-    def enumerate_neighbors(
-        self, solution: list[int]
-    ) -> Generator[list[int], None, None]:
-        for i, _ in enumerate(solution[:-1]):
-            for j, _ in enumerate(solution[:-1]):
-                if i != j:
-                    solution[i + 1], solution[j] = solution[j], solution[i + 1]
-                    yield solution
-                    solution[i + 1], solution[j] = solution[j], solution[i + 1]
-
-
-class NeighborhoodStructureEnum(str, Enum):
-    TWOOPT = "TwoOpt"
-
-    def get_neighborhood_structure_class(self) -> Type[NeighborhoodStructure]:
-        neighborhood_structure_mapping = {
-            NeighborhoodStructureEnum.TWOOPT: TwoOpt
-        }
-        return neighborhood_structure_mapping[self]
+    def improve(
+        self,
+        instance_handler: InstanceHandler,
+        scost: int,
+        solution: list[int]
+    ) -> tuple[int | None, list[int] | None]:
+        solution_pdump = pickle.dumps(solution)
+        for i in range(len(solution) - 1):
+            for j in range(i+2, len(solution)-1):
+                cost_i_to_j = instance_handler.calculate_isolated_cost(solution[i], solution[j])
+                cost_i1_to_j1 = instance_handler.calculate_isolated_cost(solution[i + 1], solution[j + 1])
+                cost_i_to_i1 = instance_handler.calculate_isolated_cost(solution[i], solution[i + 1])
+                cost_j_to_j1 = instance_handler.calculate_isolated_cost(solution[j], solution[j + 1])
+                new_cost = scost + cost_i_to_j + cost_i1_to_j1 - cost_i_to_i1 - cost_j_to_j1
+                if new_cost < scost:
+                    new_solution = pickle.loads(solution_pdump)
+                    new_solution[i + 1:j + 1] = list(reversed(new_solution[i + 1:j + 1]))
+                    return new_cost, new_solution
+        return None, None
