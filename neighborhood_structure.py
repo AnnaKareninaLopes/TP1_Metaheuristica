@@ -20,8 +20,6 @@ class TwoOpt(NeighborhoodStructure):
     def improve(
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
     ) -> tuple[int | None, list[int] | None]:
-        best_solution = None
-        best_cost = None
         solution_pdump = pickle.dumps(solution)
         for i in range(len(solution) - 1):
             for j in range(i + 2, len(solution) - 1):
@@ -45,6 +43,5 @@ class TwoOpt(NeighborhoodStructure):
                     new_solution[i + 1 : j + 1] = list(
                         reversed(new_solution[i + 1 : j + 1])
                     )
-                    best_solution = new_solution
-                    best_cost = new_cost
-        return best_cost, best_solution
+                    return new_cost, new_solution
+        return None, None
