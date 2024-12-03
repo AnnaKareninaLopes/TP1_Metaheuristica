@@ -19,7 +19,7 @@ class HeuristicMethods(str, Enum):
     CHEAPEST_INSERTION = "ci"
 
     def solve(self, instance_handler: InstanceHandler, start_city: int) -> None:
-        heuristic_mapping:dict[HeuristicMethods, Type[ConstructiveHeuristic]] = {
+        heuristic_mapping: dict[HeuristicMethods, Type[ConstructiveHeuristic]] = {
             HeuristicMethods.MST: Mst,
             HeuristicMethods.CLOSEST_NEIGHBOR: NearestNeighbor,
             HeuristicMethods.CHEAPEST_INSERTION: CheapestInsertion,
