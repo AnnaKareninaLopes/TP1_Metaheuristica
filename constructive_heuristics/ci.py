@@ -85,7 +85,8 @@ class CheapestInsertion(ConstructiveHeuristic):
         return vetor_solucao, distancias_total
 
     def __init__(self, cordenates: list[list[int, int]], first_city: int):
-        self.dicionario_ordenado = self.criar_dicionario_cidades_ordenadas(cordenates)
+        matriz_distancias = self.criar_matriz_distancias(cordenates)
+        self.dicionario_ordenado = self.criar_dicionario_cidades_ordenadas(matriz_distancias)
         self.matriz_distancias = cordenates
         self.first_city = first_city
 
