@@ -50,7 +50,7 @@ class LocalSearchMethods(str, Enum):
         neighborhood_struct = neighborhood_struct_mapping[self]()
         start_time = time.time()
         local_search = HillClimbing(
-            Mst(instance_handler.cordenadas, start_city), neighborhood_struct
+            NearestNeighbor(instance_handler.cordenadas, start_city), neighborhood_struct
         )
         cost, path = local_search.solve(instance_handler)
         end_time = time.time()
