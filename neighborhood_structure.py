@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import pickle
-from typing import Optional
 
 from instance_handler import InstanceHandler
 
@@ -9,7 +8,7 @@ class NeighborhoodStructure(ABC):
     @abstractmethod
     def improve(
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
-    ) -> tuple[Optional[int], Optional[list[int]]]:
+    ) -> tuple[int, list[int]] | tuple[None, None]:
         """
         Should to try improve a current solution with base a specific
         neighborhood structure
@@ -19,7 +18,7 @@ class NeighborhoodStructure(ABC):
 class TwoOpt(NeighborhoodStructure):
     def improve(
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
-    ) -> tuple[int | None, list[int] | None]:
+    ) -> tuple[int, list[int]] | tuple[None, None]:
         solution_pdump = pickle.dumps(solution)
         for i in range(len(solution) - 1):
             for j in range(i + 2, len(solution) - 1):
