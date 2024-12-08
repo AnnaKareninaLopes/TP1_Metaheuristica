@@ -12,7 +12,7 @@ class CheapestInsertion(ConstructiveHeuristic):
         # Obtém a cidade mais próxima da cidade inicial
         cidade_atual = cidade_inicial
         cidade_proxima = dicionario[cidade_atual][0]  # Acessa diretamente a cidade mais próxima
-        distancia_primeiro_traco = matriz_distancias[cidade_atual - 1][cidade_proxima - 1]  # Distância até a primeira cidade
+        distancia_primeiro_traco = matriz_distancias[cidade_atual][cidade_proxima]  # Distância até a primeira cidade
         distancias_total += distancia_primeiro_traco  # Adiciona a distância
         vetor_solucao.append(cidade_proxima)
 
@@ -29,9 +29,9 @@ class CheapestInsertion(ConstructiveHeuristic):
 
         cidade_proxima_2 = min(
             cidades_disponiveis,
-            key=lambda x: matriz_distancias[cidade_inicial - 1][x - 1]  # Ordena pela distância
+            key=lambda x: matriz_distancias[cidade_inicial][x]  # Ordena pela distância
         )
-        distancia_segundo_traco = matriz_distancias[cidade_inicial - 1][cidade_proxima_2 - 1]
+        distancia_segundo_traco = matriz_distancias[cidade_inicial][cidade_proxima_2]
         distancias_total += distancia_segundo_traco  # Adiciona a distância
         vetor_solucao.append(cidade_proxima_2)
 
@@ -39,7 +39,7 @@ class CheapestInsertion(ConstructiveHeuristic):
         vetor_candidatos.remove(cidade_proxima_2)
 
         # Agora, o ciclo é fechado: cidade_proxima_2 -> cidade_inicial
-        distancia_fechamento = matriz_distancias[cidade_proxima_2 - 1][cidade_inicial - 1]
+        distancia_fechamento = matriz_distancias[cidade_proxima_2][cidade_inicial]
         distancias_total += distancia_fechamento  # Adiciona a distância de fechamento
         vetor_solucao.append(cidade_inicial)
 
@@ -62,12 +62,12 @@ class CheapestInsertion(ConstructiveHeuristic):
             # Para cada cidade candidata, tentamos inseri-la em todas as posições do vetor_solucao
             for candidato in vetor_candidatos:
                 for i in range(1, len(vetor_solucao)):
-                    cidade_anterior = vetor_solucao[i - 1]
+                    cidade_anterior = vetor_solucao[i]
                     cidade_posterior = vetor_solucao[i]
                     # Cálculo do custo de inserção: a distância total entre cidades será alterada
-                    custo = (matriz_distancias[cidade_anterior - 1][candidato - 1] +
-                            matriz_distancias[candidato - 1][cidade_posterior - 1] -
-                            matriz_distancias[cidade_anterior - 1][cidade_posterior - 1])
+                    custo = (matriz_distancias[cidade_anterior][candidato] +
+                            matriz_distancias[candidato][cidade_posterior] -
+                            matriz_distancias[cidade_anterior][cidade_posterior])
 
                     # Verifica se o custo calculado é o menor custo encontrado até agora
                     if custo < menor_custo:
@@ -86,8 +86,9 @@ class CheapestInsertion(ConstructiveHeuristic):
 
     def __init__(self, cordenates: list[list[int, int]], first_city: int):
         matriz_distancias = self.criar_matriz_distancias(cordenates)
+        self.cordenates = cordenates
         self.dicionario_ordenado = self.criar_dicionario_cidades_ordenadas(matriz_distancias)
-        self.matriz_distancias = cordenates
+        self.matriz_distancias = matriz_distancias
         self.first_city = first_city
 
     def solve(self):
