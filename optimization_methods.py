@@ -18,7 +18,7 @@ class HeuristicMethods(str, Enum):
     CLOSEST_NEIGHBOR = "nn"
     CHEAPEST_INSERTION = "ci"
 
-    def solve(self, instance_handler: InstanceHandler, start_city: int) -> None:
+    def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
         heuristic_mapping: dict[HeuristicMethods, Type[ConstructiveHeuristic]] = {
             HeuristicMethods.MST: Mst,
             HeuristicMethods.CLOSEST_NEIGHBOR: NearestNeighbor,
@@ -38,12 +38,13 @@ class HeuristicMethods(str, Enum):
             objective_function=cost,
             execution_time=run_time,
         )
+        return [city+1 for city in path]
 
 
 class LocalSearchMethods(str, Enum):
     LS2OPT = "ls2opt"
 
-    def solve(self, instance_handler: InstanceHandler, start_city: int) -> None:
+    def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
         neighborhood_struct_mapping = {
             LocalSearchMethods.LS2OPT: TwoOpt,
         }
@@ -62,3 +63,4 @@ class LocalSearchMethods(str, Enum):
             objective_function=cost,
             execution_time=run_time,
         )
+        return [city+1 for city in path]

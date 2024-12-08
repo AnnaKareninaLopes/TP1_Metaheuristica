@@ -42,8 +42,10 @@ def main():
     # Nome do arquivo de saída
     arquivo_saida = args.output
 
-    method.solve(instance_handler, args.initial_node)
+    path = method.solve(instance_handler, args.initial_node)
 
+    print("Caminho encontrado:")
+    print(path)
     print(f"Resultados salvos em {arquivo_saida}")
 
 
