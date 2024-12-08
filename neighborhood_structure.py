@@ -54,39 +54,24 @@ class TreeOpt(NeighborhoodStructure):
             tour = tour[:-1]
         melhor_FO = scost
         n = len(solution)
-        melhorou = True
+        for i in range(n - 2):
+            for j in range(i + 1, n - 1):
+                for k in range(j + 1, n):
+                    variantes = [
+                        tour[:i] + tour[i:j][::-1] + tour[j:k][::-1] + tour[k:],
+                        tour[:i] + tour[j:k][::-1] + tour[i:j] + tour[k:],
+                        tour[:i] + tour[j:k][::-1] + tour[i:j][::-1] + tour[k:],
+                        tour[:i] + tour[i:j] + tour[j:k][::-1] + tour[k:],
+                        tour[:i] + tour[i:j][::-1] + tour[k:j:-1] + tour[j:],
+                        tour[:i] + tour[k:j:-1] + tour[i:j] + tour[j:],
+                        tour[:i] + tour[k:j:-1] + tour[i:j][::-1] + tour[j:],
+                        tour[:i] + tour[i:j] + tour[k:j:-1] + tour[j:]
+                    ]
 
-        while melhorou:
-            melhorou = False
-
-            for i in range(n - 2):
-                for j in range(i + 1, n - 1):
-                    for k in range(j + 1, n):
-                        variantes = [
-                            tour[:i] + tour[i:j][::-1] + tour[j:k][::-1] + tour[k:],
-                            tour[:i] + tour[j:k][::-1] + tour[i:j] + tour[k:],
-                            tour[:i] + tour[j:k][::-1] + tour[i:j][::-1] + tour[k:],
-                            tour[:i] + tour[i:j] + tour[j:k][::-1] + tour[k:],
-                            tour[:i] + tour[i:j][::-1] + tour[k:j:-1] + tour[j:],
-                            tour[:i] + tour[k:j:-1] + tour[i:j] + tour[j:],
-                            tour[:i] + tour[k:j:-1] + tour[i:j][::-1] + tour[j:],
-                            tour[:i] + tour[i:j] + tour[k:j:-1] + tour[j:]
-                        ]
-
-                        for variante in variantes:
-                            melhor_FO_nova = instance_handler.calcular_funcao_objetivo(variante)
-                            if melhor_FO_nova < melhor_FO:
-                                tour = variante
-                                melhor_FO = melhor_FO_nova
-                                melhorou = True
-                                break
-
-                        if melhorou:
-                            break
-                    if melhorou:
-                        break
-                if melhorou:
-                    break
+                    for variante in variantes:
+                        melhor_FO_nova = instance_handler.calcular_funcao_objetivo(variante)
+                        if melhor_FO_nova < melhor_FO:
+                            return melhor_FO_nova, variante
 
 
-        return melhor_FO, tour
+        return None, None
