@@ -94,15 +94,10 @@ class Swap(NeighborhoodStructure):
 
     def swap(self, instance_handler: InstanceHandler, i: int, n:int,  solucao: list[int], FO: int):
         n = len(solucao)
-        solucao_vizinha = solucao[:]
-        print("Tamanho solução na função swap: ", n)
-        print("Solução na função swap: ", solucao_vizinha)
 
         # Inicializando deltas
         delta1 = 0
         delta2 = 0
-
-        print(f"Tentando realizar o swap no índice {i}...")
 
 
         if i == 0:
