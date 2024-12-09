@@ -9,7 +9,7 @@ from constructive_heuristics import (
     NearestNeighbor,
 )
 from local_search.hill_climbing import HillClimbing
-from neighborhood_structure import Reallocate, TwoOpt
+from neighborhood_structure import Reallocate, Swap, TwoOpt
 from instance_handler import InstanceHandler
 
 
@@ -43,12 +43,14 @@ class HeuristicMethods(str, Enum):
 
 class LocalSearchMethods(str, Enum):
     LS2OPT = "ls2opt"
-    REALLOCATE = "reallocate"
+    LSREALLOCATE = "lsreallocate"
+    SWAP = "lsswap"
 
     def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
         neighborhood_struct_mapping = {
             LocalSearchMethods.LS2OPT: TwoOpt,
-            LocalSearchMethods.REALLOCATE: Reallocate,
+            LocalSearchMethods.LSREALLOCATE: Reallocate,
+            LocalSearchMethods.SWAP: Swap,
         }
         neighborhood_struct = neighborhood_struct_mapping[self]()
         start_time = time.time()

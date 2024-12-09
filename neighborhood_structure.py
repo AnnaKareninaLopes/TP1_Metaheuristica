@@ -89,3 +89,77 @@ class Reallocate(NeighborhoodStructure):
                     solucao_atual[i:j + 1] = solucao_atual[i:j + 1][::-1]
 
         return melhor_FO, melhor_solucao
+
+class Swap(NeighborhoodStructure):
+
+    def swap(self, instance_handler: InstanceHandler, i: int, n:int,  solucao: list[int], FO: int):
+        n = len(solucao)
+        solucao_vizinha = solucao[:]
+        print("Tamanho solução na função swap: ", n)
+        print("Solução na função swap: ", solucao_vizinha)
+
+        # Inicializando deltas
+        delta1 = 0
+        delta2 = 0
+
+        print(f"Tentando realizar o swap no índice {i}...")
+
+
+        if i == 0:
+            delta1 = (
+                instance_handler.calculate_isolated_cost(solucao[n-2], solucao[n-1])
+                + instance_handler.calculate_isolated_cost(solucao[1], solucao[2])
+            )
+            delta2 = (
+                instance_handler.calculate_isolated_cost(solucao[0], solucao[2])
+                + instance_handler.calculate_isolated_cost(solucao[n-2], solucao[1])
+            )
+            return FO - delta1 + delta2
+        elif i == n-2:
+            delta1 = (
+                instance_handler.calculate_isolated_cost(solucao[n-3], solucao[n-2])
+                + instance_handler.calculate_isolated_cost(solucao[0], solucao[1])
+            )
+            delta2 = (
+                instance_handler.calculate_isolated_cost(solucao[n-3], solucao[n-1])
+                + instance_handler.calculate_isolated_cost(solucao[n-2], solucao[1])
+            )
+            return FO - delta1 + delta2
+        else:
+            delta1 = (
+                instance_handler.calculate_isolated_cost(solucao[i-1], solucao[i])
+                + instance_handler.calculate_isolated_cost(solucao[i+1], solucao[i+2])
+            )
+            delta2 = (
+                instance_handler.calculate_isolated_cost(solucao[i-1], solucao[i+1])
+                + instance_handler.calculate_isolated_cost(solucao[i], solucao[i+2])
+            )
+            return FO - delta1 + delta2
+
+
+    def busca_local_swap(self, instance_handler: InstanceHandler, solucao, FO):
+
+        n = len(solucao)
+        solucao_atual = solucao[:]
+        FO_atual = FO
+        melhor_solucao = None
+        melhor_FO = None
+
+        for i in range(0, n - 1):
+            FOvizinho = self.swap(instance_handler, i, n, solucao_atual, FO_atual)
+
+            if FOvizinho < FO_atual:
+                FO_atual = FOvizinho
+                solucao_atual[i], solucao_atual[i + 1] = solucao_atual[i + 1], solucao_atual[i]
+                if i == 0:
+                    solucao_atual[-1] = solucao_atual[0]
+                elif i == n-2:
+                    solucao_atual[0] = solucao_atual[-1]
+                melhor_solucao = solucao_atual
+                melhor_FO = FO_atual
+
+        return melhor_FO, melhor_solucao
+    def improve(
+        self, instance_handler: InstanceHandler, scost: int, solution: list[int]
+    ):
+        return self.busca_local_swap(instance_handler, solution, scost)
