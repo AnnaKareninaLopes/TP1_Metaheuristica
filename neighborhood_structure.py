@@ -47,32 +47,50 @@ class TwoOpt(NeighborhoodStructure):
 
 class Reallocate(NeighborhoodStructure):
 
-    def aplicar_relocate_primeiro_aprimorante(
-        self, solucao: list[int], instance_handler: InstanceHandler, custo_corrente: int
+    def realocate(
+        self, i: int, j: int, s_at: list[int], s_ofv: int, instance_handler: InstanceHandler
     ):
-        if solucao[0] == solucao[-1]:
-            solucao = solucao[:-1]
+        """
+        Realoca a subsequência de `s_at[i]` a `s_at[i+1]` para a posição `j`, recalculando o custo total.
+        
+        Delta1 = custo dos arcos que envolvem `i` e `i+1` antes da realocação.
+        Delta2 = custo dos arcos que envolvem `j` e `j+1` após a realocação.
+        """
 
-        n = len(solucao)
-        melhor_custo = custo_corrente  # Usa o custo inicial passado como parâmetro
-        melhor_solucao = solucao[:]
-        for i in range(n):  # Início da subsequência
-            for j in range(i + 1, n + 1):  # Fim da subsequência
-                subsequencia = solucao[i:j]  # Subsequência a ser relocada
+        # Calcula Delta1
+        delta1 = (
+            instance_handler.calculate_isolated_cost(s_at[i - 1], s_at[i]) +
+            instance_handler.calculate_isolated_cost(s_at[j], s_at[j + 1])
+        )
 
-                for k in range(n):  # Posição de reinserção
-                    if k < i or k >= j:  # Evita reinserir na mesma posição
-                        nova_solucao = solucao[:i] + solucao[j:]  # Remove a subsequência
-                        nova_solucao = nova_solucao[:k] + subsequencia + nova_solucao[k:]  # Reinsere a subsequência
-                        novo_custo = instance_handler.calcular_funcao_objetivo(solution=nova_solucao)
-                        if novo_custo < melhor_custo:
-                            melhor_custo = novo_custo
-                            melhor_solucao = nova_solucao
+        # Calcula Delta2 após a realocação dos elementos
+        delta2 = (
+            instance_handler.calculate_isolated_cost(s_at[i-1], s_at[j]) +
+            instance_handler.calculate_isolated_cost(s_at[i], s_at[j + 1])
+        )
 
-        # Retorna a melhor solução encontrada
-        return melhor_solucao, melhor_custo
+        # Atualiza o valor de FONova
+        FONova = s_ofv - delta1 + delta2
+
+        return FONova
 
     def improve(
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
     ) -> tuple[int, list[int]] | tuple[None, None]:
-        return self.aplicar_relocate_primeiro_aprimorante(solution, instance_handler, scost)
+        n = len(solution)
+        solucao_atual = solution[:]
+        fo_atual = scost
+        melhor_solucao = None
+        melhor_FO = None
+
+        for i in range(1, n-1):
+            for j in range(i + 1, n-1):
+                # Verifique o custo da nova solução após a realocação
+                FONova = self.realocate(i, j, solucao_atual, fo_atual, instance_handler)
+
+                # Se a nova solução for melhor (menor custo), faça a troca
+                if FONova < scost:
+                    fo_atual = FONova
+                    solucao_atual[i:j + 1] = solucao_atual[i:j + 1][::-1]
+
+        return melhor_FO, melhor_solucao
