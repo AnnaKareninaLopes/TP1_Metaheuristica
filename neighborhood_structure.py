@@ -57,19 +57,16 @@ class Reallocate(NeighborhoodStructure):
         Delta2 = custo dos arcos que envolvem `j` e `j+1` após a realocação.
         """
 
-        # Calcula Delta1
         delta1 = (
             instance_handler.calculate_isolated_cost(s_at[i - 1], s_at[i]) +
             instance_handler.calculate_isolated_cost(s_at[j], s_at[j + 1])
         )
 
-        # Calcula Delta2 após a realocação dos elementos
         delta2 = (
             instance_handler.calculate_isolated_cost(s_at[i-1], s_at[j]) +
             instance_handler.calculate_isolated_cost(s_at[i], s_at[j + 1])
         )
 
-        # Atualiza o valor de FONova
         FONova = s_ofv - delta1 + delta2
 
         return FONova
@@ -85,10 +82,8 @@ class Reallocate(NeighborhoodStructure):
 
         for i in range(1, n-1):
             for j in range(i + 1, n-1):
-                # Verifique o custo da nova solução após a realocação
                 FONova = self.realocate(i, j, solucao_atual, fo_atual, instance_handler)
 
-                # Se a nova solução for melhor (menor custo), faça a troca
                 if FONova < scost:
                     fo_atual = FONova
                     solucao_atual[i:j + 1] = solucao_atual[i:j + 1][::-1]
