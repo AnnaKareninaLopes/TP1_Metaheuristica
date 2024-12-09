@@ -38,12 +38,12 @@ function run_benchmark_and_storage_output_by_instance_file(){
 
     for file in $(ls $instances_dir); do
         echo "Running to instance $file"
-        echo "running now agm heuristic"
-        python3 main.py $instances_dir/$file $agm_output_dir/results.txt agm $start_node > /dev/null 2>&1
-        echo "running now nn heuristic"
-        python3 main.py $instances_dir/$file $nn_output_dir/results.txt nn $start_node > /dev/null 2>&1
-        echo "running now ci heuristic"
-        python3 main.py $instances_dir/$file $ci_output_dir/results.txt ci $start_node > /dev/null 2>&1
+        echo "running now lsswap local-search"
+        python3 main.py $instances_dir/$file $agm_output_dir/results.txt $start_node --local-search lsswap > /dev/null 2>&1
+        echo "running now ls2opt local-search"
+        python3 main.py $instances_dir/$file $nn_output_dir/results.txt $start_node --local-search ls2opt > /dev/null 2>&1
+        echo "running now lsreallocate local-search"
+        python3 main.py $instances_dir/$file $ci_output_dir/results.txt $start_node --local-search lsreallocate > /dev/null 2>&1
     done
 
 }
