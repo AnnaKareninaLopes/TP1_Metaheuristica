@@ -28,22 +28,22 @@ function run_benchmark_and_storage_output_by_instance_file(){
     instances_dir=$2
     start_node=$3
 
-    agm_output_dir="$output_dir/agm"
-    nn_output_dir="$output_dir/nn"
-    ci_output_dir="$output_dir/ci"
+    twooptout="$output_dir/2opt"
+    swapout="$output_dir/swap"
+    reallocate="$output_dir/reallocate"
     # Create output directory
-    mkdir -p $agm_output_dir
-    mkdir -p $nn_output_dir
-    mkdir -p $ci_output_dir
+    mkdir -p $twooptout
+    mkdir -p $swapout
+    mkdir -p $reallocate
 
     for file in $(ls $instances_dir); do
         echo "Running to instance $file"
-        echo "running now agm heuristic"
-        python3 main.py $instances_dir/$file $agm_output_dir/results.txt agm $start_node > /dev/null 2>&1
-        echo "running now nn heuristic"
-        python3 main.py $instances_dir/$file $nn_output_dir/results.txt nn $start_node > /dev/null 2>&1
-        echo "running now ci heuristic"
-        python3 main.py $instances_dir/$file $ci_output_dir/results.txt ci $start_node > /dev/null 2>&1
+        echo "running now lsswap local-search"
+        python3 main.py $instances_dir/$file $swapout/results.txt $start_node --local-search lsswap > /dev/null 2>&1
+        echo "running now ls2opt local-search"
+        python3 main.py $instances_dir/$file $twooptout/results.txt $start_node --local-search ls2opt > /dev/null 2>&1
+        echo "running now lsreallocate local-search"
+        python3 main.py $instances_dir/$file $reallocate/results.txt $start_node --local-search lsreallocate > /dev/null 2>&1
     done
 
 }
