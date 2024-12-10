@@ -37,7 +37,7 @@ class TwoOpt(NeighborhoodStructure):
                 new_cost = (
                     scost + cost_i_to_j + cost_i1_to_j1 - cost_i_to_i1 - cost_j_to_j1
                 )
-                if round(new_cost, 6) < round(scost, 6):
+                if new_cost < scost:
                     new_solution = pickle.loads(solution_pdump)
                     new_solution[i + 1 : j + 1] = list(
                         reversed(new_solution[i + 1 : j + 1])
