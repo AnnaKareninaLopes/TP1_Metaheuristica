@@ -30,7 +30,6 @@ class VND(LocalSearch):
             nc, ns = neighborhood.improve(instance_handler, current_cost, current_solution)
             if ns:
                 return nc, ns
-            print('oi')
         return None, None
 
     def solve(self, instance_handler: InstanceHandler) -> tuple[int, list[int]]:

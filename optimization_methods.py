@@ -9,7 +9,7 @@ from constructive_heuristics import (
     NearestNeighbor,
 )
 from local_search import HillClimbing, VND
-from neighborhood_structure import Reallocate, Swap, TwoOpt
+from neighborhood_structure import Reallocate, Swap, SwapDistance,  TwoOpt
 from instance_handler import InstanceHandler
 
 
@@ -52,7 +52,7 @@ class LocalSearchMethods(str, Enum):
             LocalSearchMethods.LS2OPT: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), TwoOpt()),
             LocalSearchMethods.LSREALLOCATE: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Reallocate()),
             LocalSearchMethods.SWAP: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Swap()),
-            LocalSearchMethods.VND: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), Reallocate(), Swap()])
+            LocalSearchMethods.VND: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), SwapDistance(), Reallocate()])
         }
         start_time = time.time()
         local_search = neighborhood_struct_mapping[self](instance_handler, start_city)

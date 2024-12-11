@@ -37,7 +37,7 @@ class TwoOpt(NeighborhoodStructure):
                 new_cost = (
                     scost + cost_i_to_j + cost_i1_to_j1 - cost_i_to_i1 - cost_j_to_j1
                 )
-                if new_cost < scost:
+                if round(new_cost, 6) < round(scost, 6):
                     new_solution = pickle.loads(solution_pdump)
                     new_solution[i + 1 : j + 1] = list(
                         reversed(new_solution[i + 1 : j + 1])
@@ -158,3 +158,54 @@ class Swap(NeighborhoodStructure):
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
     ):
         return self.busca_local_swap(instance_handler, solution, scost)
+
+class SwapDistance(NeighborhoodStructure):
+
+    def __calc(self, i: int, j: int, instance_handler: InstanceHandler, sol_at:list[int], scost: int) -> int:
+        before_i = (i - 1) % len(sol_at)
+        after_i = (i + 1) % len(sol_at)
+        before_j = (j - 1) % len(sol_at)
+        after_j = (j + 1) % len(sol_at)
+
+        if after_i == j or after_j == i:
+            delta1 = (
+                instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[i]) +
+                instance_handler.calculate_isolated_cost(sol_at[after_j], sol_at[j])
+            )
+            delta2 = (
+                instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[j]) +
+                instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
+            )
+            return scost - delta1 + delta2
+
+        delta1 = (
+            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[i]) +
+            instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_i]) +
+            instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[j]) +
+            instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_j])
+        )
+        delta2 = (
+            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[j]) +
+            instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_i]) +
+            instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[i]) +
+            instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
+        )
+        return scost - delta1 + delta2
+
+    def improve(self, instance_handler: InstanceHandler, scost: int, solution: list[int]):
+        best_solution = None
+        best_cost = None
+        current_fo = scost
+        for i in range(len(solution) - 1):
+            for j in range(i + 1, len(solution)):
+                neighborhood_cust = self.__calc(i, j, instance_handler, solution, scost)
+                if round(neighborhood_cust, 6) < round(current_fo, 6):
+                    current_fo = neighborhood_cust
+                    best_solution = solution[:]
+                    best_solution[i], best_solution[j] = best_solution[j], best_solution[i]
+                    best_cost = neighborhood_cust
+                    if 0 in {i, j}:
+                        best_solution[-1] = best_solution[0]
+                    elif len(solution) - 1 in {i, j}:
+                        best_solution[0] = best_solution[-1]
+        return best_cost, best_solution
