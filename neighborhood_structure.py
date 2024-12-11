@@ -45,27 +45,30 @@ class TwoOpt(NeighborhoodStructure):
                     return new_cost, new_solution
         return None, None
 
-class Reallocate(NeighborhoodStructure):
 
+class Reallocate(NeighborhoodStructure):
     def realocate(
-        self, i: int, j: int, s_at: list[int], s_ofv: int, instance_handler: InstanceHandler
+        self,
+        i: int,
+        j: int,
+        s_at: list[int],
+        s_ofv: int,
+        instance_handler: InstanceHandler,
     ):
         """
         Realoca a subsequência de `s_at[i]` a `s_at[i+1]` para a posição `j`, recalculando o custo total.
-        
+
         Delta1 = custo dos arcos que envolvem `i` e `i+1` antes da realocação.
         Delta2 = custo dos arcos que envolvem `j` e `j+1` após a realocação.
         """
 
-        delta1 = (
-            instance_handler.calculate_isolated_cost(s_at[i - 1], s_at[i]) +
-            instance_handler.calculate_isolated_cost(s_at[j], s_at[j + 1])
-        )
+        delta1 = instance_handler.calculate_isolated_cost(
+            s_at[i - 1], s_at[i]
+        ) + instance_handler.calculate_isolated_cost(s_at[j], s_at[j + 1])
 
-        delta2 = (
-            instance_handler.calculate_isolated_cost(s_at[i-1], s_at[j]) +
-            instance_handler.calculate_isolated_cost(s_at[i], s_at[j + 1])
-        )
+        delta2 = instance_handler.calculate_isolated_cost(
+            s_at[i - 1], s_at[j]
+        ) + instance_handler.calculate_isolated_cost(s_at[i], s_at[j + 1])
 
         FONova = s_ofv - delta1 + delta2
 
@@ -80,60 +83,58 @@ class Reallocate(NeighborhoodStructure):
         melhor_solucao = None
         melhor_FO = None
 
-        for i in range(1, n-1):
-            for j in range(i + 1, n-1):
+        for i in range(1, n - 1):
+            for j in range(i + 1, n - 1):
                 FONova = self.realocate(i, j, solucao_atual, fo_atual, instance_handler)
 
                 if FONova < scost:
                     fo_atual = FONova
-                    solucao_atual[i:j + 1] = solucao_atual[i:j + 1][::-1]
+                    solucao_atual[i : j + 1] = solucao_atual[i : j + 1][::-1]
 
         return melhor_FO, melhor_solucao
 
-class Swap(NeighborhoodStructure):
 
-    def swap(self, instance_handler: InstanceHandler, i: int, n:int,  solucao: list[int], FO: int):
+class Swap(NeighborhoodStructure):
+    def swap(
+        self,
+        instance_handler: InstanceHandler,
+        i: int,
+        n: int,
+        solucao: list[int],
+        FO: int,
+    ):
         n = len(solucao)
 
         # Inicializando deltas
         delta1 = 0
         delta2 = 0
 
-
         if i == 0:
-            delta1 = (
-                instance_handler.calculate_isolated_cost(solucao[n-2], solucao[n-1])
-                + instance_handler.calculate_isolated_cost(solucao[1], solucao[2])
-            )
-            delta2 = (
-                instance_handler.calculate_isolated_cost(solucao[0], solucao[2])
-                + instance_handler.calculate_isolated_cost(solucao[n-2], solucao[1])
-            )
+            delta1 = instance_handler.calculate_isolated_cost(
+                solucao[n - 2], solucao[n - 1]
+            ) + instance_handler.calculate_isolated_cost(solucao[1], solucao[2])
+            delta2 = instance_handler.calculate_isolated_cost(
+                solucao[0], solucao[2]
+            ) + instance_handler.calculate_isolated_cost(solucao[n - 2], solucao[1])
             return FO - delta1 + delta2
-        elif i == n-2:
-            delta1 = (
-                instance_handler.calculate_isolated_cost(solucao[n-3], solucao[n-2])
-                + instance_handler.calculate_isolated_cost(solucao[0], solucao[1])
-            )
-            delta2 = (
-                instance_handler.calculate_isolated_cost(solucao[n-3], solucao[n-1])
-                + instance_handler.calculate_isolated_cost(solucao[n-2], solucao[1])
-            )
+        elif i == n - 2:
+            delta1 = instance_handler.calculate_isolated_cost(
+                solucao[n - 3], solucao[n - 2]
+            ) + instance_handler.calculate_isolated_cost(solucao[0], solucao[1])
+            delta2 = instance_handler.calculate_isolated_cost(
+                solucao[n - 3], solucao[n - 1]
+            ) + instance_handler.calculate_isolated_cost(solucao[n - 2], solucao[1])
             return FO - delta1 + delta2
         else:
-            delta1 = (
-                instance_handler.calculate_isolated_cost(solucao[i-1], solucao[i])
-                + instance_handler.calculate_isolated_cost(solucao[i+1], solucao[i+2])
-            )
-            delta2 = (
-                instance_handler.calculate_isolated_cost(solucao[i-1], solucao[i+1])
-                + instance_handler.calculate_isolated_cost(solucao[i], solucao[i+2])
-            )
+            delta1 = instance_handler.calculate_isolated_cost(
+                solucao[i - 1], solucao[i]
+            ) + instance_handler.calculate_isolated_cost(solucao[i + 1], solucao[i + 2])
+            delta2 = instance_handler.calculate_isolated_cost(
+                solucao[i - 1], solucao[i + 1]
+            ) + instance_handler.calculate_isolated_cost(solucao[i], solucao[i + 2])
             return FO - delta1 + delta2
 
-
     def busca_local_swap(self, instance_handler: InstanceHandler, solucao, FO):
-
         n = len(solucao)
         solucao_atual = solucao[:]
         FO_atual = FO
@@ -145,54 +146,65 @@ class Swap(NeighborhoodStructure):
 
             if FOvizinho < FO_atual:
                 FO_atual = FOvizinho
-                solucao_atual[i], solucao_atual[i + 1] = solucao_atual[i + 1], solucao_atual[i]
+                solucao_atual[i], solucao_atual[i + 1] = (
+                    solucao_atual[i + 1],
+                    solucao_atual[i],
+                )
                 if i == 0:
                     solucao_atual[-1] = solucao_atual[0]
-                elif i == n-2:
+                elif i == n - 2:
                     solucao_atual[0] = solucao_atual[-1]
                 melhor_solucao = solucao_atual
                 melhor_FO = FO_atual
 
         return melhor_FO, melhor_solucao
+
     def improve(
         self, instance_handler: InstanceHandler, scost: int, solution: list[int]
     ):
         return self.busca_local_swap(instance_handler, solution, scost)
 
-class SwapDistance(NeighborhoodStructure):
 
-    def __calc(self, i: int, j: int, instance_handler: InstanceHandler, sol_at:list[int], scost: int) -> int:
+class SwapDistance(NeighborhoodStructure):
+    def __calc(
+        self,
+        i: int,
+        j: int,
+        instance_handler: InstanceHandler,
+        sol_at: list[int],
+        scost: int,
+    ) -> int:
         before_i = (i - 1) % len(sol_at)
         after_i = (i + 1) % len(sol_at)
         before_j = (j - 1) % len(sol_at)
         after_j = (j + 1) % len(sol_at)
 
         if after_i == j or after_j == i:
-            delta1 = (
-                instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[i]) +
-                instance_handler.calculate_isolated_cost(sol_at[after_j], sol_at[j])
-            )
-            delta2 = (
-                instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[j]) +
-                instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
-            )
+            delta1 = instance_handler.calculate_isolated_cost(
+                sol_at[before_i], sol_at[i]
+            ) + instance_handler.calculate_isolated_cost(sol_at[after_j], sol_at[j])
+            delta2 = instance_handler.calculate_isolated_cost(
+                sol_at[before_i], sol_at[j]
+            ) + instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
             return scost - delta1 + delta2
 
         delta1 = (
-            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[i]) +
-            instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_i]) +
-            instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[j]) +
-            instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_j])
+            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[i])
+            + instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_i])
+            + instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[j])
+            + instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_j])
         )
         delta2 = (
-            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[j]) +
-            instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_i]) +
-            instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[i]) +
-            instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
+            instance_handler.calculate_isolated_cost(sol_at[before_i], sol_at[j])
+            + instance_handler.calculate_isolated_cost(sol_at[j], sol_at[after_i])
+            + instance_handler.calculate_isolated_cost(sol_at[before_j], sol_at[i])
+            + instance_handler.calculate_isolated_cost(sol_at[i], sol_at[after_j])
         )
         return scost - delta1 + delta2
 
-    def improve(self, instance_handler: InstanceHandler, scost: int, solution: list[int]):
+    def improve(
+        self, instance_handler: InstanceHandler, scost: int, solution: list[int]
+    ):
         best_solution = None
         best_cost = None
         current_fo = scost
@@ -202,7 +214,10 @@ class SwapDistance(NeighborhoodStructure):
                 if round(neighborhood_cust, 6) < round(current_fo, 6):
                     current_fo = neighborhood_cust
                     best_solution = solution[:]
-                    best_solution[i], best_solution[j] = best_solution[j], best_solution[i]
+                    best_solution[i], best_solution[j] = (
+                        best_solution[j],
+                        best_solution[i],
+                    )
                     best_cost = neighborhood_cust
                     if 0 in {i, j}:
                         best_solution[-1] = best_solution[0]

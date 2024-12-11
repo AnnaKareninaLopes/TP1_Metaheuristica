@@ -4,8 +4,8 @@ from neighborhood_structure import NeighborhoodStructure
 
 from .local_search import LocalSearch
 
-class VND(LocalSearch):
 
+class VND(LocalSearch):
     def __init__(
         self,
         initial_heuristic: ConstructiveHeuristic,
@@ -14,7 +14,12 @@ class VND(LocalSearch):
         self.__initial_heuristic = initial_heuristic
         self.__avaible_neighborhoods = avaible_neighborhoods
 
-    def improve(self, instance_handler: InstanceHandler, current_solution: list[int], current_cost: int) -> tuple[int, list[int]] | tuple[None, None]:
+    def improve(
+        self,
+        instance_handler: InstanceHandler,
+        current_solution: list[int],
+        current_cost: int,
+    ) -> tuple[int, list[int]] | tuple[None, None]:
         """
         Improve the current solution using some neighborhood structure that was
         able of provides some improvement to current solution, if nothing is able
@@ -27,7 +32,9 @@ class VND(LocalSearch):
         improvement
         """
         for neighborhood in self.__avaible_neighborhoods:
-            nc, ns = neighborhood.improve(instance_handler, current_cost, current_solution)
+            nc, ns = neighborhood.improve(
+                instance_handler, current_cost, current_solution
+            )
             if ns:
                 return nc, ns
         return None, None
@@ -39,7 +46,9 @@ class VND(LocalSearch):
         best_solution = self.__initial_heuristic.solve()
         best_cost = instance_handler.calcular_funcao_objetivo(best_solution)
         while True:
-            new_cost, new_solution = self.improve(instance_handler, best_solution, best_cost)
+            new_cost, new_solution = self.improve(
+                instance_handler, best_solution, best_cost
+            )
             if not new_solution:
                 break
             best_solution = new_solution

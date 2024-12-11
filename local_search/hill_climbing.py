@@ -4,6 +4,7 @@ from neighborhood_structure import NeighborhoodStructure
 
 from .local_search import LocalSearch
 
+
 class HillClimbing(LocalSearch):
     def __init__(
         self,

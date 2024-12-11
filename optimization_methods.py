@@ -9,7 +9,7 @@ from constructive_heuristics import (
     NearestNeighbor,
 )
 from local_search import LocalSearch, HillClimbing, VND
-from neighborhood_structure import Reallocate, Swap, SwapDistance,  TwoOpt
+from neighborhood_structure import Reallocate, Swap, SwapDistance, TwoOpt
 from instance_handler import InstanceHandler
 
 
@@ -38,7 +38,7 @@ class HeuristicMethods(str, Enum):
             objective_function=cost,
             execution_time=run_time,
         )
-        return [city+1 for city in path]
+        return [city + 1 for city in path]
 
 
 class LocalSearchMethods(str, Enum):
@@ -66,4 +66,4 @@ class LocalSearchMethods(str, Enum):
             objective_function=cost,
             execution_time=run_time,
         )
-        return [city+1 for city in path]
+        return [city + 1 for city in path]

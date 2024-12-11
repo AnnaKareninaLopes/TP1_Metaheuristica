@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from instance_handler import InstanceHandler
 
-class LocalSearch(ABC):
 
+class LocalSearch(ABC):
     @abstractmethod
     def solve(self, instance_handler: InstanceHandler) -> tuple[int, list[int]]:
         """

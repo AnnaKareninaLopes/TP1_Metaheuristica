@@ -1,13 +1,15 @@
 from .base import ConstructiveHeuristic
 
-class NearestNeighbor(ConstructiveHeuristic):
 
+class NearestNeighbor(ConstructiveHeuristic):
     def __init__(self, cordenates: list[list[int, int]], first_city: int):
         self.cordenates = cordenates
         self.first_city = first_city
         matriz_distancias = self.criar_matriz_distancias(cordenates)
         self.matriz_distancias = matriz_distancias
-        self.dicionario_ondenado = self.criar_dicionario_cidades_ordenadas(matriz_distancias)
+        self.dicionario_ondenado = self.criar_dicionario_cidades_ordenadas(
+            matriz_distancias
+        )
 
     def solve(self) -> list[int]:
         dicionario = self.dicionario_ondenado
@@ -18,7 +20,7 @@ class NearestNeighbor(ConstructiveHeuristic):
         distancia_total = 0
 
         while len(vetor_solucao) < len(dicionario):
-            menor_distancia = float('inf')
+            menor_distancia = float("inf")
             vizinho_mais_proximo = None
 
             for vizinho in dicionario[cidade_atual]:
