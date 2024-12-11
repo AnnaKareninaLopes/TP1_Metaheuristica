@@ -1,6 +1,6 @@
 from enum import Enum
 import time
-from typing import Type
+from typing import Callable, Type
 
 from constructive_heuristics import (
     ConstructiveHeuristic,
@@ -8,7 +8,7 @@ from constructive_heuristics import (
     Mst,
     NearestNeighbor,
 )
-from local_search import HillClimbing, VND
+from local_search import LocalSearch, HillClimbing, VND
 from neighborhood_structure import Reallocate, Swap, SwapDistance,  TwoOpt
 from instance_handler import InstanceHandler
 
@@ -48,7 +48,7 @@ class LocalSearchMethods(str, Enum):
     VND = "vnd"
 
     def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
-        neighborhood_struct_mapping = {
+        neighborhood_struct_mapping: dict[str, Callable[[InstanceHandler, int], LocalSearch]] = {
             LocalSearchMethods.LS2OPT: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), TwoOpt()),
             LocalSearchMethods.LSREALLOCATE: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Reallocate()),
             LocalSearchMethods.SWAP: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Swap()),
