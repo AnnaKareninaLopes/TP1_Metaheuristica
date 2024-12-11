@@ -1,9 +1,10 @@
 from constructive_heuristics import ConstructiveHeuristic
-from neighborhood_structure import NeighborhoodStructure
 from instance_handler import InstanceHandler
+from neighborhood_structure import NeighborhoodStructure
 
+from .local_search import LocalSearch
 
-class HillClimbing:
+class HillClimbing(LocalSearch):
     def __init__(
         self,
         constructive_heuristic: ConstructiveHeuristic,

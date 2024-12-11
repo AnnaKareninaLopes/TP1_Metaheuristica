@@ -8,7 +8,7 @@ from constructive_heuristics import (
     Mst,
     NearestNeighbor,
 )
-from local_search.hill_climbing import HillClimbing
+from local_search import HillClimbing, VND
 from neighborhood_structure import Reallocate, Swap, TwoOpt
 from instance_handler import InstanceHandler
 
@@ -45,18 +45,17 @@ class LocalSearchMethods(str, Enum):
     LS2OPT = "ls2opt"
     LSREALLOCATE = "lsreallocate"
     SWAP = "lsswap"
+    VND = "vnd"
 
     def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
         neighborhood_struct_mapping = {
-            LocalSearchMethods.LS2OPT: TwoOpt,
-            LocalSearchMethods.LSREALLOCATE: Reallocate,
-            LocalSearchMethods.SWAP: Swap,
+            LocalSearchMethods.LS2OPT: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), TwoOpt()),
+            LocalSearchMethods.LSREALLOCATE: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Reallocate()),
+            LocalSearchMethods.SWAP: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Swap()),
+            LocalSearchMethods.VND: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), Reallocate(), Swap()])
         }
-        neighborhood_struct = neighborhood_struct_mapping[self]()
         start_time = time.time()
-        local_search = HillClimbing(
-            NearestNeighbor(instance_handler.cordenadas, start_city), neighborhood_struct
-        )
+        local_search = neighborhood_struct_mapping[self](instance_handler, start_city)
         cost, path = local_search.solve(instance_handler)
         end_time = time.time()
         run_time = end_time - start_time
