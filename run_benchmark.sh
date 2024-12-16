@@ -28,22 +28,42 @@ function run_benchmark_and_storage_output_by_instance_file(){
     instances_dir=$2
     start_node=$3
 
-    twooptout="$output_dir/2opt"
-    swapout="$output_dir/swap"
-    reallocate="$output_dir/reallocate"
+    ls2opt="$output_dir/ls2opt"
+    vndtsr="$output_dir/vndtsr"
+    vndtrs="$output_dir/vndtrs"
+    vndstr="$output_dir/vndstr"
+    vndsrt="$output_dir/vndsrt"
+    vndrts="$output_dir/vndrts"
+    vndrst="$output_dir/vndrst"
+    cstsr="$output_dir/cstsr"
     # Create output directory
-    mkdir -p $twooptout
-    mkdir -p $swapout
-    mkdir -p $reallocate
+    mkdir -p $ls2opt
+    mkdir -p $vndtsr
+    mkdir -p $vndtrs
+    mkdir -p $vndstr
+    mkdir -p $vndsrt
+    mkdir -p $vndrts
+    mkdir -p $vndrst
+    mkdir -p $cstsr
 
     for file in $(ls $instances_dir); do
         echo "Running to instance $file"
-        echo "running now lsswap local-search"
-        python3 main.py $instances_dir/$file $swapout/results.txt $start_node --local-search lsswap > /dev/null 2>&1
         echo "running now ls2opt local-search"
-        python3 main.py $instances_dir/$file $twooptout/results.txt $start_node --local-search ls2opt > /dev/null 2>&1
-        echo "running now lsreallocate local-search"
-        python3 main.py $instances_dir/$file $reallocate/results.txt $start_node --local-search lsreallocate > /dev/null 2>&1
+        python3 main.py $instances_dir/$file $ls2opt/results.txt $start_node --local-search ls2opt > /dev/null 2>&1
+        echo "running now vndtsr local-search"
+        python3 main.py $instances_dir/$file $vndtsr/results.txt $start_node --local-search vndtsr > /dev/null 2>&1
+        echo "running now vndtrs local-search"
+        python3 main.py $instances_dir/$file $vndtrs/results.txt $start_node --local-search vndtrs > /dev/null 2>&1
+        echo "running now vndstr local-search"
+        python3 main.py $instances_dir/$file $vndstr/results.txt $start_node --local-search vndstr > /dev/null 2>&1
+        echo "running now vndsrt local-search"
+        python3 main.py $instances_dir/$file $vndsrt/results.txt $start_node --local-search vndsrt > /dev/null 2>&1
+        echo "running now vndrts local-search"
+        python3 main.py $instances_dir/$file $vndrts/results.txt $start_node --local-search vndrts > /dev/null 2>&1
+        echo "running now vndrst local-search"
+        python3 main.py $instances_dir/$file $vndrst/results.txt $start_node --local-search vndrst > /dev/null 2>&1
+        echo "running now cstsr local-search"
+        python3 main.py $instances_dir/$file $cstsr/results.txt $start_node --local-search cstsr > /dev/null 2>&1
     done
 
 }
