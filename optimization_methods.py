@@ -8,7 +8,7 @@ from constructive_heuristics import (
     Mst,
     NearestNeighbor,
 )
-from local_search import LocalSearch, HillClimbing, VND
+from local_search import CircularSearch, LocalSearch, HillClimbing, VND
 from neighborhood_structure import Reallocate, Swap, SwapDistance, TwoOpt
 from instance_handler import InstanceHandler
 
@@ -45,14 +45,26 @@ class LocalSearchMethods(str, Enum):
     LS2OPT = "ls2opt"
     LSREALLOCATE = "lsreallocate"
     SWAP = "lsswap"
-    VND = "vnd"
+    VNDTSR = "vndtsr"
+    VNDTRS = "vndtrs"
+    VNDSTR = "vndstr"
+    VNDSRT = "vndsrt"
+    VNDRTS = "vndrts"
+    VNDRST = "vndrst"
+    CSTSR = "cstsr"
 
     def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
         neighborhood_struct_mapping: dict[str, Callable[[InstanceHandler, int], LocalSearch]] = {
             LocalSearchMethods.LS2OPT: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), TwoOpt()),
             LocalSearchMethods.LSREALLOCATE: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Reallocate()),
             LocalSearchMethods.SWAP: lambda ih, start: HillClimbing(NearestNeighbor(ih.cordenadas, start), Swap()),
-            LocalSearchMethods.VND: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), SwapDistance(), Reallocate()])
+            LocalSearchMethods.VNDTSR: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), SwapDistance(), Reallocate()]),
+            LocalSearchMethods.VNDTRS: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), Reallocate(), Swap()]),
+            LocalSearchMethods.VNDSTR: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [Swap(), TwoOpt(), Reallocate()]),
+            LocalSearchMethods.VNDSRT: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [Swap(), Reallocate(), TwoOpt()]),
+            LocalSearchMethods.VNDRTS: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [Reallocate(), TwoOpt(), Swap()]),
+            LocalSearchMethods.VNDRST: lambda ih, start: VND(NearestNeighbor(ih.cordenadas, start), [Reallocate(), Swap(), TwoOpt()]),
+            LocalSearchMethods.CSTSR: lambda ih, start: CircularSearch(NearestNeighbor(ih.cordenadas, start), [TwoOpt(), Swap(), Reallocate()])
         }
         start_time = time.time()
         local_search = neighborhood_struct_mapping[self](instance_handler, start_city)
