@@ -1,4 +1,3 @@
-from constructive_heuristics import ConstructiveHeuristic
 from instance_handler import InstanceHandler
 from neighborhood_structure import NeighborhoodStructure
 
@@ -8,10 +7,8 @@ from .local_search import LocalSearch
 class VND(LocalSearch):
     def __init__(
         self,
-        initial_heuristic: ConstructiveHeuristic,
         avaible_neighborhoods: list[NeighborhoodStructure],
     ):
-        self.__initial_heuristic = initial_heuristic
         self.__avaible_neighborhoods = avaible_neighborhoods
 
     def improve(
@@ -39,11 +36,11 @@ class VND(LocalSearch):
                 return nc, ns
         return None, None
 
-    def solve(self, instance_handler: InstanceHandler) -> tuple[int, list[int]]:
+    def solve(self, initial_solution:list[int], instance_handler: InstanceHandler) -> tuple[int, list[int]]:
         """
         Solve the TSP problem using the VND local search algorithm
         """
-        best_solution = self.__initial_heuristic.solve()
+        best_solution = initial_solution
         best_cost = instance_handler.calcular_funcao_objetivo(best_solution)
         while True:
             new_cost, new_solution = self.improve(

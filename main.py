@@ -2,7 +2,7 @@ import argparse
 from typing import Union
 
 from instance_handler import InstanceHandler
-from optimization_methods import HeuristicMethods, LocalSearchMethods
+from optimization_methods import HeuristicMethods, LocalSearchMethods, MetaheuristicMethods
 
 
 def create_parser():
@@ -29,6 +29,12 @@ def create_parser():
         type=LocalSearchMethods,
         help="Método de busca local a ser utilizado",
     )
+    group.add_argument(
+        "--metaheuristic",
+        dest="method",
+        type=MetaheuristicMethods,
+        help="Metaheurística a ser utilizada",
+    )
     return parser
 
 
@@ -37,7 +43,7 @@ def main():
     args = p.parse_args()
     instance_handler = InstanceHandler(args.filename, args.output)
 
-    method: Union[HeuristicMethods, LocalSearchMethods] = args.method
+    method: Union[HeuristicMethods, LocalSearchMethods, MetaheuristicMethods] = args.method
 
     # Nome do arquivo de saída
     arquivo_saida = args.output

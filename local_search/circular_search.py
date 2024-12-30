@@ -1,4 +1,3 @@
-from constructive_heuristics import ConstructiveHeuristic
 from instance_handler import InstanceHandler
 from neighborhood_structure import NeighborhoodStructure
 
@@ -10,11 +9,9 @@ class CircularSearch(LocalSearch):
 
     def __init__(
         self,
-        initial_heuristic: ConstructiveHeuristic,
         avaible_neighborhoods: list[NeighborhoodStructure],
     ):
         self.__avaible_neighborhoods = avaible_neighborhoods
-        self.__initial_heuristic = initial_heuristic
 
     def __improve(
         self,
@@ -35,8 +32,8 @@ class CircularSearch(LocalSearch):
             return last_feasible_cost, last_feasible
         return None, None
 
-    def solve(self, instance_handler: InstanceHandler) -> tuple[int, list[int]]:
-        best_solution = self.__initial_heuristic.solve()
+    def solve(self, initial_solution: list[int], instance_handler: InstanceHandler) -> tuple[int, list[int]]:
+        best_solution = initial_solution
         best_cost = instance_handler.calcular_funcao_objetivo(best_solution)
         while True:
             new_cost, new_solution = self.__improve(

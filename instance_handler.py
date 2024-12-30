@@ -53,7 +53,11 @@ class InstanceHandler:
         self.__input = filename
         self.cordenadas = cordenadas
         self.__optimal = optimal
+        self.__cities = range(0, len(cordenadas))
         self.__output_file = output_file
+
+    def get_cities(self) -> list[int]:
+        return self.__cities
 
     def save_results(
         self,
