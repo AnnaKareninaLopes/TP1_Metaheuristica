@@ -22,7 +22,7 @@ function Run-Benchmark-And-Store-Output-By-InstanceFile {
     )
 
     # Define local search methods
-    $searchMethods = @("ls2opt", "vndtsr", "vndtrs", "vndstr", "vndsrt", "vndrts", "vndrst", "cstsr")
+    $searchMethods = @("grasphc", "graspvnd")
 
     # Create directories for each search method
     foreach ($method in $searchMethods) {
@@ -41,7 +41,8 @@ function Run-Benchmark-And-Store-Output-By-InstanceFile {
             $ResultFile = [IO.Path]::Combine($OutputDir, $method, "results.txt")
             $InputFile = [IO.Path]::Combine($InstancesDir, $file)
             $WithVnd = if ($method.Contains("vnd")) { "true" } else { "false" }
-            Invoke-Expression "$python_command main.py $InputFile $ResultFile $StartNode grasp --grasp-max-it $GraspMaxIt --grasp-alpha $GraspAlpha --with-vnd $WithVnd > $NullDevice 2>&1"
+            Write-Output "$python_command main.py $InputFile $ResultFile $StartNode grasp --grasp-max-it $GraspMaxIt --grasp-alpha $GraspAlpha --with-vnd $WithVnd"
+            Invoke-Expression "$python_command main.py $InputFile $ResultFile $StartNode grasp --grasp-max-it $GraspMaxIt --grasp-alpha $GraspAlpha --with-vnd $WithVnd"
         }
     }
 }
