@@ -48,7 +48,7 @@ def create_parser():
     )
     grasp_parser.add_argument(
         "--with-vnd",
-        action="store_true",
+        type=lambda x: x.lower().strip() == "true",
         help="Utilizar VND no GRASP",
     )
     grasp_parser.set_defaults(
