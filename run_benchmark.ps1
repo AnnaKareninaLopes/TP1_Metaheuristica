@@ -1,16 +1,7 @@
 #!/usr/bin/pwsh
 
 function GetPythonCommand {
-    if (Get-Command python3 -ErrorAction SilentlyContinue) {
-        return "python3"
-    } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-        return "python"
-    } elseif (Get-Command py -ErrorAction SilentlyContinue) {
-        return "py"
-    } else {
-        Write-Error "Python não encontrado no sistema."
-        exit 1
-    }
+    return if ($IsWindows) { return "python" } else { return "python3" }
 }
 function Run-Benchmark-And-Store-Output-By-InstanceFile {
     param (
