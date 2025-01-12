@@ -1,35 +1,5 @@
 #!/usr/bin/pwsh
 
-
-function Run-Benchmark {
-    param (
-        [string]$OutputDir,
-        [string]$InstancesDir,
-        [string]$StartNode
-    )
-
-    # Create output directory if not exists
-    New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
-
-    # Loop through instance files and process each
-    Get-ChildItem -Path $InstancesDir | ForEach-Object {
-        $file = $_.Name
-        Write-Output "Running instance: $file"
-
-        $InstanceDir = Join-Path $OutputDir ($file -replace '\..+$')
-        New-Item -ItemType Directory -Force -Path $InstanceDir | Out-Null
-
-        # Define heuristics
-        $heuristics = @("agm", "nn", "ci")
-
-        foreach ($heuristic in $heuristics) {
-            Write-Output "Running $heuristic heuristic"
-            $ResultFile = "$InstanceDir\result.$file.$heuristic.txt"
-            python3 main.py "$InstancesDir\$file" $ResultFile $heuristic $StartNode > $null 2>&1
-        }
-    }
-}
-
 function Run-Benchmark-And-Store-Output-By-InstanceFile {
     param (
         [string]$OutputDir,
@@ -52,8 +22,10 @@ function Run-Benchmark-And-Store-Output-By-InstanceFile {
 
         foreach ($method in $searchMethods) {
             Write-Output "Running $method local search"
-            $ResultFile = "$OutputDir\$method\results.txt"
-            python3 main.py "$InstancesDir\$file" $ResultFile $StartNode --local-search $method > $null 2>&1
+            $ResultFile = [IO.Path]::Combine($OutputDir, $method, "results.txt")
+            $InputFile = [IO.Path]::Combine($InstancesDir, $file)
+            python3 main.py $InputFile $ResultFile $StartNode --local-search $method > /dev/null 2>&1
+
         }
     }
 }
