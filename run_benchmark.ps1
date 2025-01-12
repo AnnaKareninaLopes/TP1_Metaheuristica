@@ -1,7 +1,8 @@
 #!/usr/bin/pwsh
 
 function GetPythonCommand {
-    return if ($IsWindows) { return "python" } else { return "python3" }
+    $pythoncommand = if ($IsWindows) { return "python" } else { return "python3" }
+    return $pythoncommand
 }
 function Run-Benchmark-And-Store-Output-By-InstanceFile {
     param (
