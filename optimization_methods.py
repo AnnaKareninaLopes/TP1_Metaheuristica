@@ -90,8 +90,8 @@ class MetaheuristicMethods(str, Enum):
         ALPHA = 0.5
         MAX_IT = 100
         methods = {
-            MetaheuristicMethods.GRASPVND: lambda ih, start: Grasp(start, ALPHA, MAX_IT, VND([TwoOpt(), SwapDistance(), Reallocate()])),
-            MetaheuristicMethods.GRASPHC: lambda ih, start: Grasp(start, ALPHA, MAX_IT, HillClimbing(TwoOpt()))
+            MetaheuristicMethods.GRASPVND: lambda ih, start: Grasp(ALPHA, start, VND([TwoOpt(), SwapDistance(), Reallocate()]), MAX_IT),
+            MetaheuristicMethods.GRASPHC: lambda ih, start: Grasp(ALPHA, start, HillClimbing(TwoOpt()), MAX_IT)
         }
         start_time = time.time()
         grasp = methods[self](instance_handler, start_city)

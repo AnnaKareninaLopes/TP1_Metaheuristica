@@ -32,9 +32,15 @@ class Grasp(Metaheuristics):
 
     def __init__(
         self,
-        local_search: LocalSearch
+        alpha: float,
+        initial_city:int,
+        local_search: LocalSearch,
+        max_it: int,
     ):
+        self.__alpha = alpha
         self.__local_search = local_search
+        self.__initial_city = initial_city
+        self.__max_it = max_it
 
     def __construct_greedy_random_solution(
         self,
@@ -52,14 +58,13 @@ class Grasp(Metaheuristics):
         return current_solution + current_solution[0:1]
 
     def solve(
-        self,
-        alpha:float,
-        initial_city:int,
-        instance_handler: InstanceHandler,
-        max_it: int,
+        self, instance_handler: InstanceHandler,
     ) -> tuple[int, list[int]]:
         best_cost = float("inf")
         best_solution = None
+        max_it = self.__max_it
+        alpha = self.__alpha
+        initial_city = self.__initial_city
         for _ in range(max_it):
             greedy_solution = self.__construct_greedy_random_solution(alpha, initial_city, instance_handler)
             cost, solution = self.__local_search.solve(greedy_solution, instance_handler)
