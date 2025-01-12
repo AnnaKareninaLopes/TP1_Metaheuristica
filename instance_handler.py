@@ -66,6 +66,7 @@ class InstanceHandler:
         city_initial: int,
         objective_function: int,
         execution_time: float,
+        **kw,
     ):
         vertex_number = len(solution)
         edge_number = vertex_number * (vertex_number - 1) / 2
@@ -80,6 +81,7 @@ class InstanceHandler:
             f"{execution_time:.4f}",
             str(vertex_number),
             str(edge_number),
+            *[str(v) for v in kw.values()]
         ]
         if not os.path.exists(self.__output_file):
             cabecalho = [
@@ -92,6 +94,7 @@ class InstanceHandler:
                 "TIME",
                 "NODES",
                 "ARCS",
+                *[str(key) for key in kw]
             ]
             df = pd.DataFrame([linha_dados], columns=cabecalho)
             with open(self.__output_file, "w", encoding="utf-8") as f:

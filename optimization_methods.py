@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+from argparse import Namespace
 from enum import Enum
 import time
 from typing import Callable, Type
@@ -9,7 +11,7 @@ from constructive_heuristics import (
     NearestNeighbor,
 )
 from local_search import CircularSearch, LocalSearch, HillClimbing, VND
-from metaheuristics import Grasp, Metaheuristics
+from metaheuristics import Grasp
 from neighborhood_structure import Reallocate, Swap, SwapDistance, TwoOpt
 from instance_handler import InstanceHandler
 
@@ -19,7 +21,8 @@ class HeuristicMethods(str, Enum):
     CLOSEST_NEIGHBOR = "nn"
     CHEAPEST_INSERTION = "ci"
 
-    def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
+    def solve(self, instance_handler: InstanceHandler, args: Namespace) -> list[int]:
+        start_city = args.initial_node
         heuristic_mapping: dict[HeuristicMethods, Type[ConstructiveHeuristic]] = {
             HeuristicMethods.MST: Mst,
             HeuristicMethods.CLOSEST_NEIGHBOR: NearestNeighbor,
@@ -54,7 +57,8 @@ class LocalSearchMethods(str, Enum):
     VNDRST = "vndrst"
     CSTSR = "cstsr"
 
-    def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
+    def solve(self, instance_handler: InstanceHandler, args: Namespace) -> list[int]:
+        start_city = args.initial_node
         neighborhood_struct_mapping: dict[str, Callable[[InstanceHandler, int], tuple[ConstructiveHeuristic, LocalSearch]]] = {
             LocalSearchMethods.LS2OPT: lambda ih, start: (NearestNeighbor(ih.cordenadas, start), HillClimbing(TwoOpt())),
             LocalSearchMethods.LSREALLOCATE: lambda ih, start: (NearestNeighbor(ih.cordenadas, start), HillClimbing(Reallocate())),
@@ -82,27 +86,34 @@ class LocalSearchMethods(str, Enum):
         )
         return [city + 1 for city in path]
 
-class MetaheuristicMethods(str, Enum):
-    GRASPVND = 'GRASPVND'
-    GRASPHC = 'GRASPHC'
-    def solve(self, instance_handler: InstanceHandler, start_city: int) -> list[int]:
-        
-        ALPHA = 0.5
-        MAX_IT = 100
-        methods = {
-            MetaheuristicMethods.GRASPVND: lambda ih, start: Grasp(ALPHA, start, VND([TwoOpt(), SwapDistance(), Reallocate()]), MAX_IT),
-            MetaheuristicMethods.GRASPHC: lambda ih, start: Grasp(ALPHA, start, HillClimbing(TwoOpt()), MAX_IT)
-        }
+
+class MetaheuristicRunner(ABC):
+
+    @abstractmethod
+    def solve(self, instance_handler: InstanceHandler, args: Namespace) -> list[int]:
+        pass
+
+class GraspRunner(MetaheuristicRunner):
+
+    def solve(self, instance_handler: InstanceHandler, args: Namespace) -> list[int]:
+        start_city = args.initial_node
+        alpha = args.grasp_alpha
+        max_it = args.grasp_max_it
+        with_vnd = args.with_vnd
+        heuristic_name = "GRASP_" + ("VND" if with_vnd else "HILLCLIMBING")
+        local_search = VND([TwoOpt(), SwapDistance(), Reallocate()]) if with_vnd else HillClimbing(TwoOpt())
         start_time = time.time()
-        grasp = methods[self](instance_handler, start_city)
+        grasp = Grasp(alpha, start_city, local_search, max_it)
         cost, path = grasp.solve(instance_handler)
         end_time = time.time()
         run_time = end_time - start_time
         instance_handler.save_results(
             solution=path,
-            heuristic=self.value,
+            heuristic=heuristic_name,
             city_initial=start_city,
             objective_function=cost,
             execution_time=run_time,
+            MAX_IT=max_it,
+            ALPHA=alpha,
         )
         return [city + 1 for city in path]
